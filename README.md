@@ -1,7 +1,9 @@
 # Enunciado do Projeto Integrador 2026
 
 Curso: Tecnologia em Análise e Desenvolvimento de Sistemas
-Disciplina: Práticas Profissionais Integradoras I e II</b>
+
+Disciplina: Práticas Profissionais Integradoras I e II
+
 Docentes: Prof. Me. Luiz Filipe Carreiro Salazar e Prof. Me. Felipe Túlio de Castro
 
 ## Objetivos
