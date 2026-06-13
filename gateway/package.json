@@ -1,0 +1,27 @@
+{
+	"name": "gateway",
+	"version": "1.0.0",
+	"description": "Aqui ficam os scripts de captura dos dados vindos do Arduino por meio da porta serial para envio ao backend.",
+	"main": "index.js",
+	"scripts": {
+		"start:gateway": "tsx watch src/serial-gateway.ts"
+	},
+	"engines": {
+		"node": "24.x"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "commonjs",
+	"devDependencies": {
+		"@biomejs/biome": "2.4.16",
+		"typescript": "6.0.3"
+	},
+	"dependencies": {
+		"@types/node": "25.9.3",
+		"dotenv": "17.4.2",
+		"serialport": "13.0.0",
+		"tsx": "4.22.4",
+		"zod": "4.4.3"
+	}
+}

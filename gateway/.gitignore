@@ -1,0 +1,93 @@
+# Dependências
+node_modules/
+.pnp
+.pnp.js
+
+# Produção
+dist/
+build/
+.next/
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cache
+.cache/
+.eslintcache
+.stylelintcache
+.prettiercache
+*.tsbuildinfo
+
+# TypeScript
+tsconfig.tsbuildinfo
+
+# IDE e editores
+.vscode/settings.json
+.vscode/launch.json
+.vscode/*.code-snippets
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Sistema operacional
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.lnk
+
+# Testes
+coverage/
+.nyc_output/
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+prisma/migrations/**/*_migration.*
+!prisma/migrations/**/migration_lock.toml
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Uploads
+uploads/
+public/uploads/
+
+# Arquivos de ambiente
+.env*.local
+.env.vault
+
+# Node
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Cypress
+cypress/screenshots/
+cypress/videos/
+
+# Storybook
+storybook-static/
+
+# Arquivos de configuração pessoais
+.opencode/
