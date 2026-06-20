@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider     = "mysql"
+ 
+}
+
+enum Status {
+  ATIVO
+  DESATIVADO
+}
+
+model Usuario {
+  id           String    @id @default(uuid())
+  nome         String
+  email        String    @unique
+  senha        String
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime  @updatedAt @map("atualizado_em")
+  galpoes      Galpoes[]
+
+  @@map("usuarios")
+}
+
+model Galpoes {
+  id           String         @id @default(uuid())
+  nome         String
+  capacidade   Int
+  usuarioId    String         @map("usuario_id")
+  usuario      Usuario        @relation(fields: [usuarioId], references: [id])
+  criadoEm     DateTime       @default(now()) @map("criado_em")
+  atualizadoEm DateTime       @updatedAt @map("atualizado_em")
+  lotes        Lotes[]
+  dispositivos Dispositivos[]
+
+  @@index([usuarioId])
+  @@map("galpoes")
+}
+
+model Lotes {
+  id           String   @id @default(uuid())
+  quantidade   Int
+  dataInicio   DateTime @map("data_inicio")
+  status       Status
+  galpoesId    String   @map("galpoes_id")
+  galpao       Galpoes  @relation(fields: [galpoesId], references: [id])
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  @@index([galpoesId])
+  @@map("lotes")
+}
+
+model Dispositivos {
+  id             String          @id @default(uuid())
+  nome           String
+  modelo         String
+  status         Status          @default(ATIVO)
+  galpoesId      String          @map("galpoes_id")
+  galpao         Galpoes         @relation(fields: [galpoesId], references: [id])
+  criadoEm       DateTime        @default(now()) @map("criado_em")
+  atualizadoEm   DateTime        @updatedAt @map("atualizado_em")
+  leituraSensors LeituraSensor[]
+
+  @@index([galpoesId])
+  @@map("dispositivos")
+}
+
+model LeituraSensor {
+  id                String       @id @default(uuid())
+  valorLuminosidade Int          @map("valor_luminosidade")
+  dispositivosId    String       @map("dispositivos_id")
+	dispositivo       Dispositivos @relation(fields: [dispositivosId], references: [id], onDelete: Cascade)
+  criadoEm          DateTime     @default(now()) @map("criado_em")
+
+  @@index([dispositivosId])
+  @@map("leituras_sensor")
+}
