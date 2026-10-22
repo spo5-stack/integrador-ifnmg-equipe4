@@ -1,10 +1,10 @@
 import { Navigate, Route, Routes } from "react-router-dom"
 import { AuthenticatedLayout } from "@/components/layout/AuthenticatedLayout"
 import { DashboardPage } from "@/pages/dashboard/DashboardPage"
-import { CriarGalpaoView } from "@/features/galpoes/view/CriarGalpaoView"
-import { EditarGalpaoView } from "@/features/galpoes/view/EditarGalpaoView"
-import { GalpaoDetalheView } from "@/features/galpoes/view/GalpaoDetalheView"
-import { GalpoesView } from "@/features/galpoes/view/GalpoesView"
+import { CriarGalpaoPage } from "@/pages/galpoes/CriarGalpaoPage"
+import { EditarGalpaoPage } from "@/pages/galpoes/EditarGalpaoPage"
+import { GalpaoDetalhePage } from "@/pages/galpoes/GalpaoDetalhePage"
+import { GalpoesPage } from "@/pages/galpoes/GalpoesPage"
 import { CadastrarLoteView } from "@/features/lotes/view/CadastrarLoteView"
 import { CriarDispositivoView } from "@/features/dispositivos/view/CriarDispositivoView"
 import { EditarDispositivoView } from "@/features/dispositivos/view/EditarDispositivoView"
@@ -25,8 +25,8 @@ export function AppRoutes() {
       <Route element={<PrivateRoute />}>
         <Route element={<AuthenticatedLayout />}>
           <Route element={<DashboardPage />} index />
-          <Route element={<GalpoesView />} path="galpoes" />
-          <Route element={<CriarGalpaoView />} path="galpoes/novo" />
+          <Route element={<GalpoesPage />} path="galpoes" />
+          <Route element={<CriarGalpaoPage />} path="galpoes/novo" />
           <Route
             element={<CadastrarLoteView />}
             path="galpoes/:galpaoId/lotes/novo"
@@ -35,8 +35,8 @@ export function AppRoutes() {
             element={<CriarDispositivoView />}
             path="galpoes/:galpaoId/dispositivos/novo"
           />
-          <Route element={<GalpaoDetalheView />} path="galpoes/:id" />
-          <Route element={<EditarGalpaoView />} path="galpoes/:id/editar" />
+          <Route element={<GalpaoDetalhePage />} path="galpoes/:id" />
+          <Route element={<EditarGalpaoPage />} path="galpoes/:id/editar" />
           <Route
             element={<EditarDispositivoView />}
             path="dispositivos/:id/editar"

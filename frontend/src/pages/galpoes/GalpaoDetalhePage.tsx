@@ -21,8 +21,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useGalpaoDetalhe } from "@/features/galpoes/controller/useGalpaoDetalhe"
+import { useGalpaoDetalhe } from "@/hooks/useGalpaoDetalhe"
 import type { LoteDoGalpao } from "@/interfaces/galpao"
+import { calcularDiasDesde, formatarData, formatarDataHora } from "@/lib/datas"
 import { cn } from "@/lib/utils"
 
 const BADGE_BASE = "rounded-full px-3 py-1 text-xs font-semibold"
@@ -31,28 +32,6 @@ const ESTILOS_FASE: Record<string, string> = {
   INICIAL: "bg-accent text-accent-foreground",
   CRESCIMENTO: "bg-secondary text-secondary-foreground",
   PRODUCAO: "bg-primary text-primary-foreground",
-}
-
-function formatarData(valor: string): string {
-  const data = new Date(valor)
-  return Number.isNaN(data.getTime()) ? "—" : data.toLocaleDateString("pt-BR")
-}
-
-function formatarDataHora(valor: string): string {
-  const data = new Date(valor)
-  return Number.isNaN(data.getTime())
-    ? "—"
-    : data.toLocaleString("pt-BR", {
-        dateStyle: "short",
-        timeStyle: "short",
-      })
-}
-
-function calcularDiasDesde(dataInicio: string): number {
-  const inicio = new Date(dataInicio).getTime()
-  if (Number.isNaN(inicio)) return 0
-
-  return Math.max(1, Math.ceil((Date.now() - inicio) / (1000 * 60 * 60 * 24)))
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -191,7 +170,7 @@ function TabelaLotes({ lotes }: { lotes: LoteDoGalpao[] }) {
   )
 }
 
-export function GalpaoDetalheView() {
+export function GalpaoDetalhePage() {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()
   const navigate = useNavigate()

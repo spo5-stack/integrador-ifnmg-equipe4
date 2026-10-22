@@ -11,12 +11,13 @@ import type {
 
 const POR_PAGINA_SELECAO = 100
 
-export async function listarGalpoes({
-  pagina,
-  porPagina,
-}: ListarGalpoesParams): Promise<GalpoesResposta> {
+export async function listarGalpoes(
+  { pagina, porPagina }: ListarGalpoesParams,
+  signal?: AbortSignal
+): Promise<GalpoesResposta> {
   const { data } = await api.get<GalpoesResposta>("/api/galpoes", {
     params: { pagina, porPagina },
+    signal,
   })
 
   return data
@@ -46,9 +47,13 @@ export async function listarGalpoesParaSelecao(
   return galpoes
 }
 
-export async function obterGalpao(id: string): Promise<GalpaoDetalhe> {
+export async function obterGalpao(
+  id: string,
+  signal?: AbortSignal
+): Promise<GalpaoDetalhe> {
   const { data } = await api.get<GalpaoDetalhe>(
-    `/api/galpoes/${encodeURIComponent(id)}`
+    `/api/galpoes/${encodeURIComponent(id)}`,
+    { signal }
   )
 
   return data

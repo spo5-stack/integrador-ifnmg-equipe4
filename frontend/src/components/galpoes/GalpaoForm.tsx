@@ -1,51 +1,57 @@
-import { useId } from "react"
-import type { FormEvent } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
+import { useForm } from "react-hook-form"
 import { Link } from "react-router-dom"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import type { ErrosFormularioGalpao } from "@/features/galpoes/model/galpao.validation"
+import {
+  galpaoSchema,
+  type GalpaoFormValues,
+} from "@/components/galpoes/galpaoSchema"
 import { cn } from "@/lib/utils"
 
 type GalpaoFormProps = {
-  nome: string
-  capacidade: string
-  errors: ErrosFormularioGalpao
-  isSubmitting: boolean
+  defaultValues?: GalpaoFormValues
   submitLabel: string
-  onChangeNome: (valor: string) => void
-  onChangeCapacidade: (valor: string) => void
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void
   cancelHref: string
+  serverError?: string
+  isSubmitting: boolean
+  onFieldChange?: () => void
+  onSubmit: (dados: GalpaoFormValues) => void
 }
 
 export function GalpaoForm({
-  nome,
-  capacidade,
-  errors,
-  isSubmitting,
+  defaultValues,
   submitLabel,
-  onChangeNome,
-  onChangeCapacidade,
-  onSubmit,
   cancelHref,
+  serverError,
+  isSubmitting,
+  onFieldChange,
+  onSubmit,
 }: GalpaoFormProps) {
-  const formId = useId()
-  const nomeId = `${formId}-nome`
-  const capacidadeId = `${formId}-capacidade`
-  const nomeErrorId = `${nomeId}-erro`
-  const capacidadeErrorId = `${capacidadeId}-erro`
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<GalpaoFormValues>({
+    resolver: zodResolver(galpaoSchema),
+    defaultValues: defaultValues ?? { nome: "", capacidade: "" },
+    mode: "onSubmit",
+    reValidateMode: "onChange",
+  })
+
+  const nomeField = register("nome", { onChange: () => onFieldChange?.() })
+  const capacidadeField = register("capacidade", {
+    onChange: () => onFieldChange?.(),
+  })
 
   return (
     <form
       aria-busy={isSubmitting}
       className="flex flex-col gap-6"
       noValidate
-      onSubmit={(event) => {
-        event.preventDefault()
-        onSubmit(event)
-      }}
+      onSubmit={handleSubmit((dados) => onSubmit(dados))}
     >
       <div className="border-b border-border/60 pb-5">
         <h2 className="font-heading text-lg font-extrabold">
@@ -56,60 +62,59 @@ export function GalpaoForm({
         </p>
       </div>
 
-      {errors.geral ? (
+      {serverError ? (
         <div
           className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
           role="alert"
         >
-          {errors.geral}
+          {serverError}
         </div>
       ) : null}
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor={nomeId}>Nome do Galpão</Label>
+        <Label htmlFor="galpao-nome">Nome do Galpão</Label>
         <Input
-          aria-describedby={errors.nome ? nomeErrorId : undefined}
+          {...nomeField}
+          aria-describedby={errors.nome ? "galpao-nome-erro" : undefined}
           aria-invalid={Boolean(errors.nome)}
           autoComplete="off"
           className="h-auto rounded-lg border-input bg-muted px-4 py-3 text-sm focus-visible:ring-2"
-          id={nomeId}
-          name="nome"
-          onChange={(event) => onChangeNome(event.target.value)}
+          id="galpao-nome"
           placeholder="Ex: Galpão Norte 01"
-          required
           type="text"
-          value={nome}
         />
         {errors.nome ? (
-          <p className="text-xs font-medium text-destructive" id={nomeErrorId}>
-            {errors.nome}
+          <p
+            className="text-xs font-medium text-destructive"
+            id="galpao-nome-erro"
+          >
+            {errors.nome.message}
           </p>
         ) : null}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor={capacidadeId}>Capacidade (aves)</Label>
+        <Label htmlFor="galpao-capacidade">Capacidade (aves)</Label>
         <Input
-          aria-describedby={errors.capacidade ? capacidadeErrorId : undefined}
+          {...capacidadeField}
+          aria-describedby={
+            errors.capacidade ? "galpao-capacidade-erro" : undefined
+          }
           aria-invalid={Boolean(errors.capacidade)}
           className="h-auto rounded-lg border-input bg-muted px-4 py-3 text-sm focus-visible:ring-2"
-          id={capacidadeId}
+          id="galpao-capacidade"
           inputMode="numeric"
           min="1"
-          name="capacidade"
-          onChange={(event) => onChangeCapacidade(event.target.value)}
           placeholder="Ex: 500"
-          required
           step="1"
           type="number"
-          value={capacidade}
         />
         {errors.capacidade ? (
           <p
             className="text-xs font-medium text-destructive"
-            id={capacidadeErrorId}
+            id="galpao-capacidade-erro"
           >
-            {errors.capacidade}
+            {errors.capacidade.message}
           </p>
         ) : null}
       </div>

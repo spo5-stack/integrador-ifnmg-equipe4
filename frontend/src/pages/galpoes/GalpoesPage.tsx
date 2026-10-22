@@ -2,6 +2,7 @@ import { Loader2, Plus, Search, Trash2 } from "lucide-react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { RequestError } from "@/components/feedback/RequestError"
 import { SuccessBanner } from "@/components/feedback/SuccessBanner"
+import { GalpoesTable } from "@/components/galpoes/GalpoesTable"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,15 +16,14 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useGalpoes } from "@/features/galpoes/controller/useGalpoes"
-import { GalpoesTable } from "@/features/galpoes/view/GalpoesTable"
+import { useGalpoes } from "@/hooks/useGalpoes"
 import { cn } from "@/lib/utils"
 
 type GalpoesLocationState = {
   sucesso?: string
 }
 
-export function GalpoesView() {
+export function GalpoesPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const sucesso = (location.state as GalpoesLocationState | null)?.sucesso
@@ -188,7 +188,7 @@ export function GalpoesView() {
             <AlertDialogAction
               className="bg-destructive text-white hover:bg-destructive/90"
               disabled={isExcluindo}
-              onClick={() => void confirmarExclusao()}
+              onClick={() => confirmarExclusao()}
             >
               {isExcluindo ? (
                 <Loader2

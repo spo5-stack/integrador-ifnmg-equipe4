@@ -1,10 +1,12 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ArrowLeft, Building2 } from "lucide-react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { RequestError } from "@/components/feedback/RequestError"
+import { GalpaoForm } from "@/components/galpoes/GalpaoForm"
 import { buttonVariants } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useEditarGalpaoForm } from "@/features/galpoes/controller/useEditarGalpaoForm"
-import { GalpaoForm } from "@/features/galpoes/view/GalpaoForm"
+import { getApiErrorMessage, getApiErrorStatus } from "@/services/api"
+import { atualizarGalpao, obterGalpao } from "@/services/galpaoService"
 import { cn } from "@/lib/utils"
 
 function FormularioSkeleton() {
@@ -35,21 +37,55 @@ function FormularioSkeleton() {
   )
 }
 
-export function EditarGalpaoView() {
+export function EditarGalpaoPage() {
   const { id } = useParams<{ id: string }>()
-  const {
-    nome,
-    capacidade,
-    errors,
-    isLoading,
-    naoEncontrado,
-    erroCarregamento,
-    isSubmitting,
-    recarregar,
-    onChangeNome,
-    onChangeCapacidade,
-    onSubmit,
-  } = useEditarGalpaoForm(id)
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
+  const query = useQuery({
+    queryKey: ["galpao", id],
+    queryFn: ({ signal }) => obterGalpao(id as string, signal),
+    enabled: Boolean(id),
+  })
+
+  const mutation = useMutation({
+    mutationFn: (dados: { nome: string; capacidade: number }) =>
+      atualizarGalpao(id as string, dados),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["galpoes"] })
+      void queryClient.invalidateQueries({ queryKey: ["galpao", id] })
+      navigate("/galpoes", {
+        state: { sucesso: "Galpão atualizado com sucesso." },
+      })
+    },
+  })
+
+  const statusCarregamento = query.isError
+    ? getApiErrorStatus(query.error)
+    : undefined
+  const naoEncontrado =
+    !id || statusCarregamento === 404 || statusCarregamento === 400
+  const erroCarregamento =
+    query.isError && !naoEncontrado
+      ? getApiErrorMessage(
+          query.error,
+          "Não foi possível carregar o galpão. Tente novamente."
+        )
+      : null
+
+  const isLoading = query.isPending && query.fetchStatus !== "idle"
+
+  const statusEnvio = mutation.isError
+    ? getApiErrorStatus(mutation.error)
+    : undefined
+  const serverError = mutation.isError
+    ? getApiErrorMessage(
+        mutation.error,
+        statusEnvio === 400
+          ? "Dados inválidos. Verifique os campos e tente novamente."
+          : "Não foi possível atualizar o galpão. Tente novamente."
+      )
+    : undefined
 
   return (
     <div className="flex flex-col gap-6">
@@ -73,7 +109,10 @@ export function EditarGalpaoView() {
 
       {!isLoading && erroCarregamento ? (
         <div className="max-w-2xl">
-          <RequestError message={erroCarregamento} onRetry={recarregar} />
+          <RequestError
+            message={erroCarregamento}
+            onRetry={() => void query.refetch()}
+          />
         </div>
       ) : null}
 
@@ -102,17 +141,25 @@ export function EditarGalpaoView() {
         </section>
       ) : null}
 
-      {!isLoading && !naoEncontrado && !erroCarregamento ? (
+      {!isLoading && query.data && !erroCarregamento && !naoEncontrado ? (
         <section className="w-full max-w-2xl rounded-xl border border-border bg-card p-6 shadow-sm md:p-8">
           <GalpaoForm
             cancelHref="/galpoes"
-            capacidade={capacidade}
-            errors={errors}
-            isSubmitting={isSubmitting}
-            nome={nome}
-            onChangeCapacidade={onChangeCapacidade}
-            onChangeNome={onChangeNome}
-            onSubmit={(event) => void onSubmit(event)}
+            defaultValues={{
+              nome: query.data.nome,
+              capacidade: String(query.data.capacidade),
+            }}
+            isSubmitting={mutation.isPending}
+            onFieldChange={() => {
+              if (mutation.isError) mutation.reset()
+            }}
+            onSubmit={(dados) =>
+              mutation.mutate({
+                nome: dados.nome,
+                capacidade: Number(dados.capacidade),
+              })
+            }
+            serverError={serverError}
             submitLabel="Salvar"
           />
         </section>
