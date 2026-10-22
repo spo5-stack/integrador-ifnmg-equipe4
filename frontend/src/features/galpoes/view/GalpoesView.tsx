@@ -1,6 +1,7 @@
-import { CircleCheck, Loader2, Plus, Search, Trash2, X } from "lucide-react"
+import { Loader2, Plus, Search, Trash2 } from "lucide-react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { RequestError } from "@/components/feedback/RequestError"
+import { SuccessBanner } from "@/components/feedback/SuccessBanner"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -72,23 +73,12 @@ export function GalpoesView() {
       </header>
 
       {sucesso ? (
-        <div
-          className="flex min-w-0 items-start gap-3 rounded-lg border border-secondary-foreground/20 bg-secondary/40 px-4 py-3 text-sm text-secondary-foreground"
-          role="status"
-        >
-          <CircleCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-          <p className="min-w-0 flex-1 font-medium break-words">{sucesso}</p>
-          <button
-            aria-label="Fechar mensagem de sucesso"
-            className="shrink-0 rounded-md p-1 transition-colors hover:bg-secondary-foreground/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-            onClick={() =>
-              navigate(location.pathname, { replace: true, state: null })
-            }
-            type="button"
-          >
-            <X aria-hidden="true" className="size-4" />
-          </button>
-        </div>
+        <SuccessBanner
+          message={sucesso}
+          onDismiss={() =>
+            navigate(location.pathname, { replace: true, state: null })
+          }
+        />
       ) : null}
 
       <div>
