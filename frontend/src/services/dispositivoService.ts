@@ -1,10 +1,11 @@
-import { api } from "@/services/api"
 import type {
   AtualizarDispositivoDados,
   CriarDispositivoDados,
   Dispositivo,
   LeiturasDispositivoResposta,
-} from "@/features/dispositivos/model/dispositivo.types"
+  ListarLeiturasParams,
+} from "@/interfaces/dispositivo"
+import { api } from "@/services/api"
 
 export async function criarDispositivo(
   galpaoId: string,
@@ -47,10 +48,7 @@ export async function listarLeiturasDispositivo({
   pagina,
   porPagina,
   signal,
-}: {
-  dispositivoId: string
-  pagina: number
-  porPagina: number
+}: ListarLeiturasParams & {
   signal?: AbortSignal
 }): Promise<LeiturasDispositivoResposta> {
   const { data } = await api.get<LeiturasDispositivoResposta>(

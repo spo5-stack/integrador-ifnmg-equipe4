@@ -1,6 +1,7 @@
-import { useState } from "react"
 import { ArrowLeft, Copy } from "lucide-react"
+import { useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
+import { DispositivoForm } from "@/components/dispositivos/DispositivoForm"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -10,32 +11,30 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { useCriarDispositivoForm } from "@/features/dispositivos/controller/useCriarDispositivoForm"
-import { DispositivoForm } from "@/features/dispositivos/view/DispositivoForm"
+import { useCriarDispositivo } from "@/hooks/useCriarDispositivo"
 import { cn } from "@/lib/utils"
 
-export function CriarDispositivoView() {
+export function CriarDispositivoPage() {
   const { galpaoId } = useParams<{ galpaoId: string }>()
   const navigate = useNavigate()
   const [copiado, setCopiado] = useState(false)
   const [erroCopia, setErroCopia] = useState<string | null>(null)
   const {
     galpoes,
-    galpaoId: galpaoSelecionado,
-    nome,
-    modelo,
-    errors,
     isLoadingGalpoes,
     erroGalpoes,
+    recarregarGalpoes,
     isSubmitting,
+    serverError,
+    resetServerError,
     dispositivoCriadoId,
     galpaoCriadoId,
-    onChangeGalpao,
-    onChangeNome,
-    onChangeModelo,
-    recarregarGalpoes,
-    onSubmit,
-  } = useCriarDispositivoForm(galpaoId)
+    criar,
+  } = useCriarDispositivo(galpaoId)
+
+  const voltarPara = galpaoId
+    ? `/galpoes/${encodeURIComponent(galpaoId)}`
+    : "/galpoes"
 
   async function copiarId(): Promise<void> {
     if (!dispositivoCriadoId) return
@@ -53,21 +52,11 @@ export function CriarDispositivoView() {
   }
 
   function irParaGalpao(): void {
-    const destino = galpaoCriadoId || galpaoId || galpaoSelecionado
-    if (destino) {
-      navigate(`/galpoes/${encodeURIComponent(destino)}`, {
-        state: { sucesso: "Dispositivo cadastrado com sucesso." },
-      })
-    } else {
-      navigate("/galpoes", {
-        state: { sucesso: "Dispositivo cadastrado com sucesso." },
-      })
-    }
+    const destino = galpaoCriadoId || galpaoId
+    navigate(destino ? `/galpoes/${encodeURIComponent(destino)}` : "/galpoes", {
+      state: { sucesso: "Dispositivo cadastrado com sucesso." },
+    })
   }
-
-  const voltarPara = galpaoId
-    ? `/galpoes/${encodeURIComponent(galpaoId)}`
-    : "/galpoes"
 
   return (
     <div className="flex flex-col gap-6">
@@ -91,18 +80,15 @@ export function CriarDispositivoView() {
         <DispositivoForm
           cancelHref={voltarPara}
           erroGalpoes={erroGalpoes}
-          errors={errors}
-          galpaoId={galpaoSelecionado}
+          galpaoId={galpaoId ?? ""}
           galpoes={galpoes}
           isLoadingGalpoes={isLoadingGalpoes}
           isSubmitting={isSubmitting}
-          modelo={modelo}
-          nome={nome}
-          onChangeGalpao={onChangeGalpao}
-          onChangeModelo={onChangeModelo}
-          onChangeNome={onChangeNome}
+          modo="criar"
+          onFieldChange={resetServerError}
           onRetryGalpoes={recarregarGalpoes}
-          onSubmit={(event) => void onSubmit(event)}
+          onSubmit={criar}
+          serverError={serverError}
           submitLabel="Salvar"
         />
       </section>

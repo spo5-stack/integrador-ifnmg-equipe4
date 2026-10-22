@@ -1,4 +1,4 @@
-export type StatusRegistro = "ATIVO" | "DESATIVADO"
+import type { StatusRegistro } from "@/interfaces/galpao"
 
 export type Dispositivo = {
   id: string
@@ -30,6 +30,12 @@ export type LeituraDispositivo = {
 export type LeiturasDispositivoResposta = {
   leituras: LeituraDispositivo[]
   total: number
+  pagina: number
+  porPagina: number
+}
+
+export type ListarLeiturasParams = {
+  dispositivoId: string
   pagina: number
   porPagina: number
 }

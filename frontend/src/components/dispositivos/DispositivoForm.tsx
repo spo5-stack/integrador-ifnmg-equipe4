@@ -1,7 +1,14 @@
-import { useId } from "react"
-import type { FormEvent } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
+import { useForm, useWatch } from "react-hook-form"
 import { Link } from "react-router-dom"
+import type { GalpaoOpcao } from "@/interfaces/galpao"
+import {
+  dispositivoSchema,
+  type CriarDispositivoFormValues,
+  type DispositivoFormValues,
+  type EditarDispositivoFormValues,
+} from "@/components/dispositivos/dispositivoSchema"
 import { RequestError } from "@/components/feedback/RequestError"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,65 +20,80 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import type { ErrosDispositivo } from "@/features/dispositivos/model/dispositivo.validation"
-import type { StatusRegistro } from "@/features/dispositivos/model/dispositivo.types"
-import type { GalpaoOpcao } from "@/interfaces/galpao"
 import { cn } from "@/lib/utils"
 
-type DispositivoFormProps = {
-  galpoes?: GalpaoOpcao[]
+const STATUS_OPCOES = ["ATIVO", "DESATIVADO"] as const
+
+type DispositivoFormBaseProps = {
   galpaoId: string
   galpaoNome?: string
   bloquearGalpao?: boolean
-  nome: string
-  modelo: string
-  status?: StatusRegistro
-  showStatus?: boolean
-  errors: ErrosDispositivo
-  isSubmitting: boolean
+  galpoes?: GalpaoOpcao[]
   isLoadingGalpoes?: boolean
   erroGalpoes?: string | null
   onRetryGalpoes?: () => void
-  submitLabel: string
-  onChangeGalpao?: (valor: string) => void
-  onChangeNome: (valor: string) => void
-  onChangeModelo: (valor: string) => void
-  onChangeStatus?: (valor: string) => void
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void
+  serverError?: string
+  isSubmitting: boolean
+  onFieldChange?: () => void
   cancelHref: string
+  submitLabel: string
 }
 
-export function DispositivoForm({
-  galpoes = [],
-  galpaoId,
-  galpaoNome,
-  bloquearGalpao = false,
-  nome,
-  modelo,
-  status = "ATIVO",
-  showStatus = false,
-  errors,
-  isSubmitting,
-  isLoadingGalpoes = false,
-  erroGalpoes = null,
-  onRetryGalpoes,
-  submitLabel,
-  onChangeGalpao,
-  onChangeNome,
-  onChangeModelo,
-  onChangeStatus,
-  onSubmit,
-  cancelHref,
-}: DispositivoFormProps) {
-  const formId = useId()
-  const galpaoIdField = `${formId}-galpao`
-  const nomeId = `${formId}-nome`
-  const modeloId = `${formId}-modelo`
-  const statusId = `${formId}-status`
-  const nomeErrorId = `${nomeId}-erro`
-  const modeloErrorId = `${modeloId}-erro`
-  const galpaoErrorId = `${galpaoIdField}-erro`
-  const statusErrorId = `${statusId}-erro`
+type CriarDispositivoFormProps = DispositivoFormBaseProps & {
+  modo: "criar"
+  onSubmit: (dados: CriarDispositivoFormValues) => void
+}
+
+type EditarDispositivoFormProps = DispositivoFormBaseProps & {
+  modo: "editar"
+  nomeInicial: string
+  modeloInicial: string
+  statusInicial: EditarDispositivoFormValues["status"]
+  onSubmit: (dados: EditarDispositivoFormValues) => void
+}
+
+type DispositivoFormProps =
+  CriarDispositivoFormProps | EditarDispositivoFormProps
+
+export function DispositivoForm(props: DispositivoFormProps) {
+  const {
+    galpaoId,
+    galpaoNome,
+    bloquearGalpao = false,
+    galpoes = [],
+    isLoadingGalpoes = false,
+    erroGalpoes = null,
+    onRetryGalpoes,
+    serverError,
+    isSubmitting,
+    onFieldChange,
+    cancelHref,
+    submitLabel,
+    modo,
+  } = props
+
+  const ehEdicao = modo === "editar"
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors },
+  } = useForm<DispositivoFormValues>({
+    resolver: zodResolver(dispositivoSchema),
+    defaultValues: {
+      galpaoId,
+      nome: ehEdicao ? props.nomeInicial : "",
+      modelo: ehEdicao ? props.modeloInicial : "",
+      status: ehEdicao ? props.statusInicial : "ATIVO",
+    },
+    mode: "onSubmit",
+    reValidateMode: "onChange",
+  })
+
+  const galpaoSelecionado = useWatch({ control, name: "galpaoId" })
+  const statusSelecionado = useWatch({ control, name: "status" })
 
   const galpoesDoSelect = bloquearGalpao
     ? galpaoId
@@ -82,15 +104,25 @@ export function DispositivoForm({
   const formularioBloqueado =
     isSubmitting || isLoadingGalpoes || Boolean(erroGalpoes)
 
+  function enviar(valores: DispositivoFormValues): void {
+    if (ehEdicao) {
+      props.onSubmit(valores)
+      return
+    }
+
+    props.onSubmit({
+      galpaoId: valores.galpaoId,
+      nome: valores.nome,
+      modelo: valores.modelo,
+    })
+  }
+
   return (
     <form
       aria-busy={isSubmitting}
       className="flex flex-col gap-6"
       noValidate
-      onSubmit={(event) => {
-        event.preventDefault()
-        onSubmit(event)
-      }}
+      onSubmit={handleSubmit(enviar)}
     >
       <div className="border-b border-border/60 pb-5">
         <h2 className="font-heading text-lg font-extrabold">
@@ -101,12 +133,12 @@ export function DispositivoForm({
         </p>
       </div>
 
-      {errors.geral ? (
+      {serverError ? (
         <div
           className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
           role="alert"
         >
-          {errors.geral}
+          {serverError}
         </div>
       ) : null}
 
@@ -115,18 +147,23 @@ export function DispositivoForm({
       ) : null}
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor={galpaoIdField}>Galpão</Label>
+        <Label htmlFor="dispositivo-galpao">Galpão</Label>
         <Select
           disabled={formularioBloqueado || bloquearGalpao}
           items={galpoesDoSelect}
-          onValueChange={(valor) => onChangeGalpao?.(valor ?? "")}
-          value={galpaoId || null}
+          onValueChange={(valor) => {
+            setValue("galpaoId", valor ?? "", { shouldValidate: true })
+            onFieldChange?.()
+          }}
+          value={galpaoSelecionado || null}
         >
           <SelectTrigger
-            aria-describedby={errors.galpaoId ? galpaoErrorId : undefined}
+            aria-describedby={
+              errors.galpaoId ? "dispositivo-galpao-erro" : undefined
+            }
             aria-invalid={Boolean(errors.galpaoId)}
             className="h-auto w-full border-input bg-muted px-4 py-3 text-sm focus-visible:ring-2"
-            id={galpaoIdField}
+            id="dispositivo-galpao"
           >
             <SelectValue placeholder="Selecione um galpão" />
           </SelectTrigger>
@@ -150,9 +187,9 @@ export function DispositivoForm({
         {errors.galpaoId ? (
           <p
             className="text-xs font-medium text-destructive"
-            id={galpaoErrorId}
+            id="dispositivo-galpao-erro"
           >
-            {errors.galpaoId}
+            {errors.galpaoId.message}
           </p>
         ) : null}
         {!isLoadingGalpoes &&
@@ -172,73 +209,94 @@ export function DispositivoForm({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor={nomeId}>Nome do Dispositivo</Label>
+        <Label htmlFor="dispositivo-nome">Nome do Dispositivo</Label>
         <Input
-          aria-describedby={errors.nome ? nomeErrorId : undefined}
+          {...register("nome", { onChange: () => onFieldChange?.() })}
+          aria-describedby={errors.nome ? "dispositivo-nome-erro" : undefined}
           aria-invalid={Boolean(errors.nome)}
           className="h-auto rounded-lg border-input bg-muted px-4 py-3 text-sm focus-visible:ring-2"
-          id={nomeId}
-          onChange={(event) => onChangeNome(event.target.value)}
+          id="dispositivo-nome"
           placeholder="Ex: Sensor LDR 01"
           type="text"
-          value={nome}
         />
         {errors.nome ? (
-          <p className="text-xs font-medium text-destructive" id={nomeErrorId}>
-            {errors.nome}
+          <p
+            className="text-xs font-medium text-destructive"
+            id="dispositivo-nome-erro"
+          >
+            {errors.nome.message}
           </p>
         ) : null}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor={modeloId}>Modelo</Label>
+        <Label htmlFor="dispositivo-modelo">Modelo</Label>
         <Input
-          aria-describedby={errors.modelo ? modeloErrorId : undefined}
+          {...register("modelo", { onChange: () => onFieldChange?.() })}
+          aria-describedby={
+            errors.modelo ? "dispositivo-modelo-erro" : undefined
+          }
           aria-invalid={Boolean(errors.modelo)}
           className="h-auto rounded-lg border-input bg-muted px-4 py-3 text-sm focus-visible:ring-2"
-          id={modeloId}
-          onChange={(event) => onChangeModelo(event.target.value)}
+          id="dispositivo-modelo"
           placeholder="Ex: LDR-5528"
           type="text"
-          value={modelo}
         />
         {errors.modelo ? (
           <p
             className="text-xs font-medium text-destructive"
-            id={modeloErrorId}
+            id="dispositivo-modelo-erro"
           >
-            {errors.modelo}
+            {errors.modelo.message}
           </p>
         ) : null}
       </div>
 
-      {showStatus ? (
+      {ehEdicao ? (
         <div className="flex flex-col gap-2">
-          <Label htmlFor={statusId}>Status</Label>
+          <Label htmlFor="dispositivo-status">Status</Label>
           <Select
             disabled={isSubmitting}
-            onValueChange={(valor) => onChangeStatus?.(valor ?? "")}
-            value={status}
+            items={STATUS_OPCOES.map((status) => ({
+              value: status,
+              label: status,
+            }))}
+            onValueChange={(valor) => {
+              setValue(
+                "status",
+                valor as EditarDispositivoFormValues["status"],
+                {
+                  shouldValidate: true,
+                }
+              )
+              onFieldChange?.()
+            }}
+            value={statusSelecionado}
           >
             <SelectTrigger
-              aria-describedby={errors.status ? statusErrorId : undefined}
+              aria-describedby={
+                errors.status ? "dispositivo-status-erro" : undefined
+              }
               aria-invalid={Boolean(errors.status)}
               className="h-auto w-full border-input bg-muted px-4 py-3 text-sm focus-visible:ring-2"
-              id={statusId}
+              id="dispositivo-status"
             >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ATIVO">ATIVO</SelectItem>
-              <SelectItem value="DESATIVADO">DESATIVADO</SelectItem>
+              {STATUS_OPCOES.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {errors.status ? (
             <p
               className="text-xs font-medium text-destructive"
-              id={statusErrorId}
+              id="dispositivo-status-erro"
             >
-              {errors.status}
+              {errors.status.message}
             </p>
           ) : null}
         </div>

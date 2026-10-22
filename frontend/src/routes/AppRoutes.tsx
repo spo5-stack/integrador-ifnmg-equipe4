@@ -6,9 +6,9 @@ import { EditarGalpaoPage } from "@/pages/galpoes/EditarGalpaoPage"
 import { GalpaoDetalhePage } from "@/pages/galpoes/GalpaoDetalhePage"
 import { GalpoesPage } from "@/pages/galpoes/GalpoesPage"
 import { CadastrarLotePage } from "@/pages/lotes/CadastrarLotePage"
-import { CriarDispositivoView } from "@/features/dispositivos/view/CriarDispositivoView"
-import { EditarDispositivoView } from "@/features/dispositivos/view/EditarDispositivoView"
-import { DispositivoLeiturasView } from "@/features/dispositivos/view/DispositivoLeiturasView"
+import { CriarDispositivoPage } from "@/pages/dispositivos/CriarDispositivoPage"
+import { EditarDispositivoPage } from "@/pages/dispositivos/EditarDispositivoPage"
+import { DispositivoLeiturasPage } from "@/pages/dispositivos/DispositivoLeiturasPage"
 import { LoginPage } from "@/pages/auth/LoginPage"
 import { RegisterPage } from "@/pages/auth/RegisterPage"
 import { PrivateRoute } from "@/routes/PrivateRoute"
@@ -32,17 +32,17 @@ export function AppRoutes() {
             path="galpoes/:galpaoId/lotes/novo"
           />
           <Route
-            element={<CriarDispositivoView />}
+            element={<CriarDispositivoPage />}
             path="galpoes/:galpaoId/dispositivos/novo"
           />
           <Route element={<GalpaoDetalhePage />} path="galpoes/:id" />
           <Route element={<EditarGalpaoPage />} path="galpoes/:id/editar" />
           <Route
-            element={<EditarDispositivoView />}
+            element={<EditarDispositivoPage />}
             path="dispositivos/:id/editar"
           />
           <Route
-            element={<DispositivoLeiturasView />}
+            element={<DispositivoLeiturasPage />}
             path="dispositivos/:id/leituras"
           />
         </Route>

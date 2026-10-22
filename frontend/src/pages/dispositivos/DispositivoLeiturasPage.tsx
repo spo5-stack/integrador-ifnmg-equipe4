@@ -11,8 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useDispositivoLeituras } from "@/features/dispositivos/controller/useDispositivoLeituras"
-import type { Dispositivo } from "@/features/dispositivos/model/dispositivo.types"
+import { useDispositivoLeituras } from "@/hooks/useDispositivoLeituras"
+import type { Dispositivo } from "@/interfaces/dispositivo"
+import { formatarDataHora } from "@/lib/datas"
 
 type LocationState = {
   dispositivo?: Dispositivo
@@ -33,12 +34,7 @@ function LeiturasSkeleton() {
   )
 }
 
-function formatarDataHora(valor: string): string {
-  const data = new Date(valor)
-  return Number.isNaN(data.getTime()) ? "—" : data.toLocaleString("pt-BR")
-}
-
-export function DispositivoLeiturasView() {
+export function DispositivoLeiturasPage() {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()
   const estado = location.state as LocationState | null
@@ -46,6 +42,7 @@ export function DispositivoLeiturasView() {
   const voltarPara = estado?.galpoesId
     ? `/galpoes/${encodeURIComponent(estado.galpoesId)}`
     : "/galpoes"
+
   const {
     leituras,
     pagina,

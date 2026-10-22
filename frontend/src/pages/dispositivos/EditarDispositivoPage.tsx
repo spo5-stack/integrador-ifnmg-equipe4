@@ -1,18 +1,14 @@
 import { ArrowLeft, Building2 } from "lucide-react"
 import { Link, useLocation, useParams } from "react-router-dom"
+import { DispositivoForm } from "@/components/dispositivos/DispositivoForm"
 import { RequestError } from "@/components/feedback/RequestError"
 import { buttonVariants } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useEditarDispositivoForm } from "@/features/dispositivos/controller/useEditarDispositivoForm"
-import { DispositivoForm } from "@/features/dispositivos/view/DispositivoForm"
+import {
+  useEditarDispositivo,
+  type EstadoInicialEdicao,
+} from "@/hooks/useEditarDispositivo"
 import { cn } from "@/lib/utils"
-import type { Dispositivo } from "@/features/dispositivos/model/dispositivo.types"
-
-type LocationState = {
-  dispositivo?: Dispositivo
-  galpoesId?: string
-  galpaoNome?: string
-}
 
 function FormularioSkeleton() {
   return (
@@ -50,27 +46,24 @@ function FormularioSkeleton() {
   )
 }
 
-export function EditarDispositivoView() {
+export function EditarDispositivoPage() {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()
-  const estado = location.state as LocationState | null
+  const estado = location.state as EstadoInicialEdicao | null
+
   const {
+    dispositivo,
     galpaoId,
     galpaoNome,
-    nome,
-    modelo,
-    status,
-    errors,
     isLoading,
     naoEncontrado,
     erroCarregamento,
     isSubmitting,
+    serverError,
+    resetServerError,
     recarregar,
-    onChangeNome,
-    onChangeModelo,
-    onChangeStatus,
-    onSubmit,
-  } = useEditarDispositivoForm(id, estado ?? undefined)
+    editar,
+  } = useEditarDispositivo(id, estado ?? undefined)
 
   const cancelHref = galpaoId
     ? `/galpoes/${encodeURIComponent(galpaoId)}`
@@ -128,23 +121,21 @@ export function EditarDispositivoView() {
         </section>
       ) : null}
 
-      {!isLoading && !naoEncontrado && !erroCarregamento ? (
+      {!isLoading && !naoEncontrado && !erroCarregamento && dispositivo ? (
         <section className="w-full max-w-2xl rounded-xl border border-border bg-card p-6 shadow-sm md:p-8">
           <DispositivoForm
             bloquearGalpao
             cancelHref={cancelHref}
-            errors={errors}
             galpaoId={galpaoId}
             galpaoNome={galpaoNome}
             isSubmitting={isSubmitting}
-            modelo={modelo}
-            nome={nome}
-            onChangeModelo={onChangeModelo}
-            onChangeNome={onChangeNome}
-            onChangeStatus={onChangeStatus}
-            onSubmit={(event) => void onSubmit(event)}
-            showStatus
-            status={status}
+            modo="editar"
+            modeloInicial={dispositivo.modelo}
+            nomeInicial={dispositivo.nome}
+            onFieldChange={resetServerError}
+            onSubmit={editar}
+            serverError={serverError}
+            statusInicial={dispositivo.status}
             submitLabel="Salvar"
           />
         </section>
