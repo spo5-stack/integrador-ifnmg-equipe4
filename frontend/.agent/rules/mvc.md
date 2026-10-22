@@ -27,13 +27,19 @@ src/
 │   │   └── ...
 │   └── ui/             # Componentes compartilhados, incluindo shadcn/ui
 │
+├── hooks/              # Hooks de dados por funcionalidade (React Query)
+│   └── useDashboard.ts
+│
 ├── services/           # Comunicação com API e regras de acesso aos dados
 │   ├── api.ts          # Configuração compartilhada do Axios
 │   ├── authService.ts  # Serviços de autenticação
+│   ├── galpaoService.ts
 │   └── ...
 │
 ├── interfaces/         # Interfaces e tipos TypeScript
 │   ├── auth.ts
+│   ├── dashboard.ts
+│   ├── galpao.ts
 │   └── ...
 │
 ├── lib/                # Funções utilitárias compartilhadas
@@ -94,6 +100,13 @@ A estrutura acima é uma referência. Crie arquivos e pastas adicionais somente 
 - Utilize-a para funções puras que não pertencem exclusivamente a uma página ou serviço específico.
 - Não utilize essa pasta como destino genérico para qualquer código sem organização.
 
+### 6. Hooks de dados
+
+- Hooks que buscam dados de uma funcionalidade ficam em `src/hooks/use<Nome>.ts` ou próximos da página que os utiliza.
+- Use React Query (`useQuery`/`useMutation`) para estado de servidor, nunca `useEffect` + `useState` para buscar dados.
+- O hook consome os serviços de `src/services/` e devolve dados, `isLoading`, erro normalizado e uma função de recarregar.
+- Não duplique a mesma query em vários lugares; reutilize o hook ou a mesma query key.
+
 ## Regras de dependência
 
 O fluxo recomendado é:
@@ -108,15 +121,18 @@ Regras obrigatórias:
 - Páginas ou hooks podem chamar os serviços e repassar os resultados aos componentes por props.
 - Serviços não devem importar páginas ou componentes React.
 - Interfaces não devem depender de componentes, páginas ou serviços.
+- Hooks de dados podem importar serviços e interfaces, mas não devem importar componentes visuais.
 - Evite dependências circulares.
 - Não crie uma pasta ou camada adicional sem uma necessidade real.
 - Evite importar arquivos internos de outras funcionalidades quando uma abstração compartilhada for mais apropriada.
+- Ao migrar uma tela, mova tipos para `src/interfaces/` e chamadas HTTP para `src/services/`; não deixe cópias em `src/features/`.
 
 ## Estado e tratamento de erros
 
 - Utilize `useState` e outros hooks do React quando necessário.
 - Mantenha o estado próximo de onde ele é utilizado.
 - Não crie estado global para dados usados apenas em uma página.
+- Estado de servidor (dados vindos da API) deve usar React Query; estado local é para UI.
 - Estados de carregamento, sucesso e erro devem ser tratados pela página ou por um hook quando houver necessidade de compartilhar a lógica.
 - Os componentes devem receber as informações necessárias para exibir carregamento, mensagens de erro e resultados vazios.
 - Evite duplicar dados retornados pela API sem necessidade.
@@ -145,6 +161,13 @@ A funcionalidade de autenticação deve seguir esta organização:
 - `interfaces/auth.ts`: define os tipos dos dados de autenticação e das respostas da API.
 
 A página pode chamar o serviço diretamente ou utilizar um hook específico, caso a lógica cresça. Não é obrigatório criar controllers, models ou hooks para funcionalidades simples.
+
+A funcionalidade de dashboard deve seguir esta organização:
+
+- `pages/dashboard/DashboardPage.tsx`: organiza a página do dashboard.
+- `hooks/useDashboard.ts`: busca e deriva os dados do dashboard com React Query.
+- `services/dashboardService.ts` e `services/galpaoService.ts`: realizam as requisições à API.
+- `interfaces/dashboard.ts` e `interfaces/galpao.ts`: definem os tipos usados pela página.
 
 ## Regra principal
 
