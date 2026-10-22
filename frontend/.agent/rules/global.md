@@ -15,6 +15,13 @@ description: "Regras globais do frontend: escopo, stack, comandos e convenções
 - Não existe suíte de testes configurada. Não invente comandos ou padrões de teste.
 - Antes de integrar com o backend, consulte `docs/api-routes.md`; a fonte viva é `http://localhost:3333/docs/openapi.json`.
 
+## Documentação de bibliotecas
+
+- Sempre que precisar de documentação atualizada de uma biblioteca, framework, SDK, API ou CLI, use o MCP Context7 antes de assumir comportamento ou sintaxe.
+- Fluxo: `resolve-library-id` com o nome oficial da biblioteca e, em seguida, `query-docs` com a dúvida específica.
+- Use IDs versionados quando o projeto estiver preso a uma versão específica.
+- Não use Context7 para refatoração, regras de negócio, depuração local ou conceitos gerais de programação.
+
 ## Stack obrigatória
 
 - Vite 8, React 19, TypeScript 6, Tailwind CSS 4 e shadcn/ui com estilo `base-nova`.
