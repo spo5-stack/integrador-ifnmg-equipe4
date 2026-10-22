@@ -14,7 +14,11 @@ O objetivo é evitar componentes muito grandes, duplicação de código e mistur
 ```text
 src/
 ├── pages/              # Páginas da aplicação
-│   ├── LoginPage.tsx
+│   ├── auth/
+│   │   ├── LoginPage.tsx
+│   │   └── RegisterPage.tsx
+│   ├── galpoes/
+│   │   └── GalpoesPage.tsx
 │   └── ...
 │
 ├── components/         # Componentes reutilizáveis
@@ -44,6 +48,9 @@ A estrutura acima é uma referência. Crie arquivos e pastas adicionais somente 
 
 - A pasta `pages/` contém as páginas completas da aplicação.
 - Cada página deve representar uma rota ou tela, como `LoginPage.tsx`, `DashboardPage.tsx` ou `UsuariosPage.tsx`.
+- Agrupe as páginas por domínio em subpastas de `pages/` quando houver mais de uma tela do mesmo assunto, como `pages/auth/`, `pages/galpoes/`, `pages/lotes/`, `pages/dispositivos/`, `pages/leituras/` e `pages/usuarios/`.
+- Utilize nomes de pasta em minúsculas, sem acentos e no plural quando representarem um domínio, como `galpoes` e `dispositivos`.
+- Uma página isolada pode ficar diretamente em `pages/`; quando surgir outra página do mesmo domínio, mova ambas para a subpasta correspondente.
 - As páginas são responsáveis por organizar os componentes necessários para montar a tela.
 - Podem controlar o estado específico da página quando isso for simples.
 - Quando a lógica crescer, extraia-a para funções ou hooks específicos, sem criar camadas obrigatórias.
@@ -127,13 +134,15 @@ Regras obrigatórias:
 
 ## Exemplo de organização de uma funcionalidade
 
-A funcionalidade de login deve seguir esta organização:
+A funcionalidade de autenticação deve seguir esta organização:
 
-- `pages/LoginPage.tsx`: organiza a página de login.
-- `components/login/LoginForm.tsx`: renderiza o formulário e coleta os dados.
-- `services/authService.ts`: realiza a requisição de login à API.
+- `pages/auth/LoginPage.tsx`: organiza a página de login.
+- `pages/auth/RegisterPage.tsx`: organiza a página de cadastro.
+- `components/login/LoginForm.tsx`: renderiza o formulário de login e coleta os dados.
+- `components/register/RegisterForm.tsx`: renderiza o formulário de cadastro e coleta os dados.
+- `services/authService.ts`: realiza as requisições de login e cadastro à API.
 - `services/api.ts`: configura a comunicação HTTP compartilhada.
-- `interfaces/auth.ts`: define os tipos dos dados de login e da resposta da API.
+- `interfaces/auth.ts`: define os tipos dos dados de autenticação e das respostas da API.
 
 A página pode chamar o serviço diretamente ou utilizar um hook específico, caso a lógica cresça. Não é obrigatório criar controllers, models ou hooks para funcionalidades simples.
 
