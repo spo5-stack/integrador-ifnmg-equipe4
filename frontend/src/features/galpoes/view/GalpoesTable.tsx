@@ -1,5 +1,6 @@
 import { Eye, Pencil, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Link } from "react-router-dom"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
@@ -10,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import type { Galpao } from "@/features/galpoes/model/galpao.types"
+import { cn } from "@/lib/utils"
 
 type GalpoesTableProps = {
   galpoes: Galpao[]
@@ -87,7 +89,12 @@ export function GalpoesTable({
         {galpoes.map((galpao) => (
           <TableRow key={galpao.id}>
             <TableCell className="px-6 py-4 font-medium">
-              {galpao.nome}
+              <Link
+                className="underline-offset-4 transition-colors hover:text-primary hover:underline"
+                to={`/galpoes/${encodeURIComponent(galpao.id)}`}
+              >
+                {galpao.nome}
+              </Link>
             </TableCell>
             <TableCell className="px-6 py-4">
               {galpao.capacidade.toLocaleString("pt-BR")}
@@ -98,28 +105,28 @@ export function GalpoesTable({
             </TableCell>
             <TableCell className="px-6 py-4">
               <div className="flex items-center gap-1">
-                <Button
+                <Link
                   aria-label={`Editar ${galpao.nome}`}
-                  className="text-muted-foreground"
-                  disabled
-                  size="icon-sm"
-                  title="Disponível em breve"
-                  type="button"
-                  variant="ghost"
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "icon-sm" }),
+                    "text-muted-foreground"
+                  )}
+                  title="Editar"
+                  to={`/galpoes/${encodeURIComponent(galpao.id)}/editar`}
                 >
                   <Pencil aria-hidden="true" />
-                </Button>
-                <Button
+                </Link>
+                <Link
                   aria-label={`Ver detalhes de ${galpao.nome}`}
-                  className="text-muted-foreground"
-                  disabled
-                  size="icon-sm"
-                  title="Disponível em breve"
-                  type="button"
-                  variant="ghost"
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "icon-sm" }),
+                    "text-muted-foreground"
+                  )}
+                  title="Detalhes"
+                  to={`/galpoes/${encodeURIComponent(galpao.id)}`}
                 >
                   <Eye aria-hidden="true" />
-                </Button>
+                </Link>
                 <Button
                   aria-label={`Excluir ${galpao.nome}`}
                   className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"

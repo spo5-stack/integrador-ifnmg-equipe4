@@ -58,8 +58,14 @@ const INDICADORES: Indicador[] = [
   },
 ]
 
-const ACOES_RAPIDAS = [
-  { label: "Novo Galpão", icon: Building2 },
+type AcaoRapida = {
+  label: string
+  icon: LucideIcon
+  to?: string
+}
+
+const ACOES_RAPIDAS: AcaoRapida[] = [
+  { label: "Novo Galpão", icon: Building2, to: "/galpoes/novo" },
   { label: "Cadastrar Lote", icon: CirclePlus },
   { label: "Gerenciar Dispositivos", icon: Cpu },
 ]
@@ -210,7 +216,12 @@ export function DashboardView() {
                   {galpoesRecentes.map((galpao) => (
                     <TableRow key={galpao.id}>
                       <TableCell className="font-medium">
-                        {galpao.nome}
+                        <Link
+                          className="underline-offset-4 transition-colors hover:text-primary hover:underline"
+                          to={`/galpoes/${encodeURIComponent(galpao.id)}`}
+                        >
+                          {galpao.nome}
+                        </Link>
                       </TableCell>
                       <TableCell>
                         {galpao.capacidade.toLocaleString("pt-BR")}
@@ -231,10 +242,38 @@ export function DashboardView() {
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
               {ACOES_RAPIDAS.map((acao) => {
                 const Icon = acao.icon
+                const classes =
+                  "flex items-center gap-3 rounded-lg border border-border/60 p-4 text-left text-sm"
+
+                if (acao.to) {
+                  return (
+                    <Link
+                      className={cn(
+                        classes,
+                        "transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                      )}
+                      key={acao.label}
+                      to={acao.to}
+                    >
+                      <Icon
+                        aria-hidden="true"
+                        className="size-5 shrink-0 text-primary"
+                      />
+                      <span className="font-medium">{acao.label}</span>
+                      <ArrowRight
+                        aria-hidden="true"
+                        className="ml-auto size-4 text-muted-foreground"
+                      />
+                    </Link>
+                  )
+                }
 
                 return (
                   <button
-                    className="flex cursor-not-allowed items-center gap-3 rounded-lg border border-border/60 p-4 text-left text-sm text-muted-foreground opacity-70"
+                    className={cn(
+                      classes,
+                      "cursor-not-allowed text-muted-foreground opacity-70"
+                    )}
                     disabled
                     key={acao.label}
                     title="Disponível em breve"
