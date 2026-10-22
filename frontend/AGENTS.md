@@ -4,7 +4,7 @@ Frontend package for the IoT data-visualization project. It is a standalone npm 
 
 Stack: Vite 8, React 19, TypeScript 6, Tailwind CSS 4, shadcn/ui (`base-nova` style).
 
-Detailed project rules live in `.agent/rules/` (global, TypeScript, React, shadcn, axios, MVC, commits). Read the relevant rule before changing code.
+Detailed project rules live in `.agent/rules/` (global, TypeScript, React, shadcn, axios, MVC, commits, design system). Read the relevant rule before changing code. The visual source of truth is `docs/style-guide.md`, based on the reference HTML in `/home/hugo/Documentos/front-base-desing`.
 
 ## Commands
 

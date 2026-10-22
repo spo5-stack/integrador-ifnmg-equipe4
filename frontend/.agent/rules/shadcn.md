@@ -6,6 +6,7 @@ description: "Use ao criar, alterar ou escolher qualquer componente de interface
 # shadcn/ui
 
 - Sempre prefira um componente do shadcn/ui quando ele existir. Não recrie botões, inputs, selects, dialogs, tabelas, badges, cards ou outros primitivos à mão.
+- Consulte `docs/style-guide.md` para cores, tipografia, espaçamento e estados antes de montar a interface.
 - Antes de criar algo novo, verifique `src/components/ui/` e reutilize o que já existe.
 - Para adicionar um componente, use o CLI: `npx shadcn@latest add <nome>`.
 - O projeto usa o estilo `base-nova`, com `rsc: false` e primitivos de `@base-ui/react`. Não adicione pacotes Radix nem copie exemplos baseados em Radix.
