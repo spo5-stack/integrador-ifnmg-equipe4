@@ -103,7 +103,7 @@ mínimo 1. Resposta `201`:
 }
 ```
 
-Erros: `409` e-mail já cadastrado; `500`.
+Erros: `400` payload inválido; `409` e-mail já cadastrado; `500`.
 
 ### `POST /api/auth/login`
 
@@ -112,7 +112,7 @@ Erros: `409` e-mail já cadastrado; `500`.
 ```
 
 O backend normaliza o e-mail para minúsculas. Resposta `200` tem o mesmo formato
-do registro. Erros: `401` credenciais inválidas; `500`.
+do registro. Erros: `400` payload inválido; `401` credenciais inválidas; `500`.
 
 ## Dashboard
 
