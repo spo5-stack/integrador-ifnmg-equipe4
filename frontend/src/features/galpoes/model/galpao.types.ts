@@ -12,6 +12,8 @@ export type Galpao = {
 
 export type GalpaoBase = Omit<Galpao, "_count">
 
+export type GalpaoOpcao = Pick<Galpao, "id" | "nome" | "capacidade">
+
 export type ListarGalpoesParams = {
   pagina: number
   porPagina: number

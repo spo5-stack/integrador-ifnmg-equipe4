@@ -4,9 +4,12 @@ import type {
   CriarGalpaoDados,
   GalpaoBase,
   GalpaoDetalhe,
+  GalpaoOpcao,
   GalpoesResposta,
   ListarGalpoesParams,
 } from "@/features/galpoes/model/galpao.types"
+
+const POR_PAGINA_SELECAO = 100
 
 export async function listarGalpoes({
   pagina,
@@ -17,6 +20,30 @@ export async function listarGalpoes({
   })
 
   return data
+}
+
+export async function listarGalpoesParaSelecao(
+  galpaoIdInicial?: string
+): Promise<GalpaoOpcao[]> {
+  const resposta = await listarGalpoes({
+    pagina: 1,
+    porPagina: POR_PAGINA_SELECAO,
+  })
+  const galpoes: GalpaoOpcao[] = resposta.galpoes
+
+  if (galpaoIdInicial && !galpoes.some(({ id }) => id === galpaoIdInicial)) {
+    const galpao = await obterGalpao(galpaoIdInicial)
+    return [
+      ...galpoes,
+      {
+        id: galpao.id,
+        nome: galpao.nome,
+        capacidade: galpao.capacidade,
+      },
+    ]
+  }
+
+  return galpoes
 }
 
 export async function obterGalpao(id: string): Promise<GalpaoDetalhe> {
