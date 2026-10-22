@@ -1,5 +1,5 @@
+import type { CriarLoteDados, Lote } from "@/interfaces/lote"
 import { api } from "@/services/api"
-import type { CriarLoteDados, Lote } from "@/features/lotes/model/lote.types"
 
 export async function criarLote(
   galpaoId: string,

@@ -5,7 +5,7 @@ import { CriarGalpaoPage } from "@/pages/galpoes/CriarGalpaoPage"
 import { EditarGalpaoPage } from "@/pages/galpoes/EditarGalpaoPage"
 import { GalpaoDetalhePage } from "@/pages/galpoes/GalpaoDetalhePage"
 import { GalpoesPage } from "@/pages/galpoes/GalpoesPage"
-import { CadastrarLoteView } from "@/features/lotes/view/CadastrarLoteView"
+import { CadastrarLotePage } from "@/pages/lotes/CadastrarLotePage"
 import { CriarDispositivoView } from "@/features/dispositivos/view/CriarDispositivoView"
 import { EditarDispositivoView } from "@/features/dispositivos/view/EditarDispositivoView"
 import { DispositivoLeiturasView } from "@/features/dispositivos/view/DispositivoLeiturasView"
@@ -28,7 +28,7 @@ export function AppRoutes() {
           <Route element={<GalpoesPage />} path="galpoes" />
           <Route element={<CriarGalpaoPage />} path="galpoes/novo" />
           <Route
-            element={<CadastrarLoteView />}
+            element={<CadastrarLotePage />}
             path="galpoes/:galpaoId/lotes/novo"
           />
           <Route
