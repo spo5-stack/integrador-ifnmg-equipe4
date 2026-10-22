@@ -24,6 +24,8 @@ src/
 │   │   ├── GalpaoDetalhePage.tsx
 │   │   ├── CriarGalpaoPage.tsx
 │   │   └── EditarGalpaoPage.tsx
+│   ├── lotes/
+│   │   └── CadastrarLotePage.tsx
 │   └── ...
 │
 ├── components/         # Componentes reutilizáveis
@@ -34,22 +36,29 @@ src/
 │   │   ├── GalpaoForm.tsx
 │   │   ├── GalpoesTable.tsx
 │   │   └── galpaoSchema.ts
+│   ├── lotes/
+│   │   ├── CadastrarLoteForm.tsx
+│   │   └── loteSchema.ts
 │   └── ui/             # Componentes compartilhados, incluindo shadcn/ui
 │
 ├── hooks/              # Hooks de dados por funcionalidade (React Query)
 │   ├── useDashboard.ts
-│   └── useGalpoes.ts
+│   ├── useGalpoes.ts
+│   ├── useGalpaoDetalhe.ts
+│   └── useCadastrarLote.ts
 │
 ├── services/           # Comunicação com API e regras de acesso aos dados
 │   ├── api.ts          # Configuração compartilhada do Axios
 │   ├── authService.ts  # Serviços de autenticação
 │   ├── galpaoService.ts
+│   ├── loteService.ts
 │   └── ...
 │
 ├── interfaces/         # Interfaces e tipos TypeScript
 │   ├── auth.ts
 │   ├── dashboard.ts
 │   ├── galpao.ts
+│   ├── lote.ts
 │   └── ...
 │
 ├── lib/                # Funções utilitárias compartilhadas
@@ -191,6 +200,15 @@ A funcionalidade de galpões deve seguir esta organização:
 - `services/galpaoService.ts`: requisições de galpões à API.
 - `interfaces/galpao.ts`: tipos de galpões.
 - `lib/datas.ts`: formatação e cálculo de datas com dayjs.
+
+A funcionalidade de lotes deve seguir esta organização:
+
+- `pages/lotes/CadastrarLotePage.tsx`: página de cadastro de lote.
+- `components/lotes/CadastrarLoteForm.tsx`: formulário com React Hook Form + Zod.
+- `components/lotes/loteSchema.ts`: schema Zod, mensagem de capacidade e conversão dos dados.
+- `hooks/useCadastrarLote.ts`: lista de galpões e mutação de criação com React Query.
+- `services/loteService.ts`: requisições de lotes à API.
+- `interfaces/lote.ts`: tipos de lotes.
 
 ## Regra principal
 
