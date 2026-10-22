@@ -1,14 +1,16 @@
 import {
   ArrowLeft,
   Ban,
+  BarChart3,
   Bird,
   Building2,
   Cpu,
   Pencil,
   Plus,
 } from "lucide-react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import { RequestError } from "@/components/feedback/RequestError"
+import { SuccessBanner } from "@/components/feedback/SuccessBanner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -191,6 +193,9 @@ function TabelaLotes({ lotes }: { lotes: LoteDoGalpao[] }) {
 
 export function GalpaoDetalheView() {
   const { id } = useParams<{ id: string }>()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const sucesso = (location.state as { sucesso?: string } | null)?.sucesso
   const { dados, isLoading, naoEncontrado, erro, recarregar } =
     useGalpaoDetalhe(id)
 
@@ -239,6 +244,15 @@ export function GalpaoDetalheView() {
           </div>
         )}
       </header>
+
+      {sucesso ? (
+        <SuccessBanner
+          message={sucesso}
+          onDismiss={() =>
+            navigate(location.pathname, { replace: true, state: null })
+          }
+        />
+      ) : null}
 
       {isLoading ? <DetalheSkeleton /> : null}
 
@@ -299,17 +313,16 @@ export function GalpaoDetalheView() {
           >
             <div className="flex items-center justify-between gap-4 px-6 py-5">
               <h2 className="font-heading text-lg font-extrabold">Lotes</h2>
-              <Button
-                className="h-auto px-4 py-2"
-                disabled
-                size="sm"
-                title="Disponível em breve"
-                type="button"
-                variant="outline"
+              <Link
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "h-auto w-fit px-5 py-2.5 font-heading text-sm font-bold"
+                )}
+                to={`/galpoes/${encodeURIComponent(dados.id)}/lotes/novo`}
               >
                 <Plus aria-hidden="true" />
                 Cadastrar Lote
-              </Button>
+              </Link>
             </div>
             <TabelaLotes lotes={dados.lotes} />
           </section>
@@ -322,17 +335,16 @@ export function GalpaoDetalheView() {
               <h2 className="font-heading text-lg font-extrabold">
                 Dispositivos
               </h2>
-              <Button
-                className="h-auto px-4 py-2"
-                disabled
-                size="sm"
-                title="Disponível em breve"
-                type="button"
-                variant="outline"
+              <Link
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "h-auto px-4 py-2"
+                )}
+                to={`/galpoes/${encodeURIComponent(dados.id)}/dispositivos/novo`}
               >
                 <Plus aria-hidden="true" />
                 Adicionar
-              </Button>
+              </Link>
             </div>
 
             {dados.dispositivos.length === 0 ? (
@@ -343,16 +355,20 @@ export function GalpaoDetalheView() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {["Nome", "Modelo", "Status", "Última Leitura"].map(
-                      (coluna) => (
-                        <TableHead
-                          className="h-12 px-6 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
-                          key={coluna}
-                        >
-                          {coluna}
-                        </TableHead>
-                      )
-                    )}
+                    {[
+                      "Nome",
+                      "Modelo",
+                      "Status",
+                      "Última Leitura",
+                      "Ações",
+                    ].map((coluna) => (
+                      <TableHead
+                        className="h-12 px-6 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
+                        key={coluna}
+                      >
+                        {coluna}
+                      </TableHead>
+                    ))}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -385,6 +401,44 @@ export function GalpaoDetalheView() {
                         ) : (
                           "—"
                         )}
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <div className="flex flex-wrap items-center gap-1">
+                          <Link
+                            aria-label={`Ver leituras de ${dispositivo.nome}`}
+                            className={cn(
+                              buttonVariants({ variant: "ghost", size: "sm" }),
+                              "text-muted-foreground"
+                            )}
+                            title="Ver leituras"
+                            to={`/dispositivos/${encodeURIComponent(dispositivo.id)}/leituras`}
+                            state={{
+                              dispositivo,
+                              galpaoNome: dados.nome,
+                              galpoesId: dados.id,
+                            }}
+                          >
+                            <BarChart3 aria-hidden="true" />
+                            Ver leituras
+                          </Link>
+                          <Link
+                            aria-label={`Editar ${dispositivo.nome}`}
+                            className={cn(
+                              buttonVariants({ variant: "ghost", size: "sm" }),
+                              "text-muted-foreground"
+                            )}
+                            title="Editar"
+                            to={`/dispositivos/${encodeURIComponent(dispositivo.id)}/editar`}
+                            state={{
+                              dispositivo,
+                              galpaoNome: dados.nome,
+                              galpoesId: dados.id,
+                            }}
+                          >
+                            <Pencil aria-hidden="true" />
+                            Editar
+                          </Link>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
