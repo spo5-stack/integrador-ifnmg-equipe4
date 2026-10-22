@@ -13,6 +13,7 @@ description: "Regras globais do frontend: escopo, stack, comandos e convenções
 - Verificação padrão: `npm run lint`, `npm run build` e `npm run format`.
 - Evite `npm run typecheck`: o `tsconfig.json` raiz tem `files: []` e não valida `src/`. Para checar tipos use `npx tsc -p tsconfig.app.json --noEmit` ou `npm run build`.
 - Não existe suíte de testes configurada. Não invente comandos ou padrões de teste.
+- Antes de integrar com o backend, consulte `docs/api-routes.md`; a fonte viva é `http://localhost:3333/docs/openapi.json`.
 
 ## Stack obrigatória
 

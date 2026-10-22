@@ -5,6 +5,7 @@ description: "Use ao implementar qualquer requisição HTTP, cliente de API, ser
 
 # HTTP com axios
 
+- Consulte `docs/api-routes.md` antes de criar chamadas, DTOs ou models. A fonte viva é `http://localhost:3333/docs/openapi.json`.
 - Toda comunicação HTTP deve usar `axios`. Nunca use `fetch`, `XMLHttpRequest` ou wrappers que troquem o cliente.
 - Se `axios` ainda não estiver instalado, rode `npm install axios` antes de implementar a primeira chamada.
 - Crie uma instância única em `src/services/api.ts` com `baseURL`, timeout e interceptors compartilhados. Não use `axios` global diretamente.

@@ -4,7 +4,7 @@ Frontend package for the IoT data-visualization project. It is a standalone npm 
 
 Stack: Vite 8, React 19, TypeScript 6, Tailwind CSS 4, shadcn/ui (`base-nova` style).
 
-Detailed project rules live in `.agent/rules/` (global, TypeScript, React, shadcn, axios, MVC, commits, design system). Read the relevant rule before changing code. The visual source of truth is `docs/style-guide.md`, based on the reference HTML in `/home/hugo/Documentos/front-base-desing`.
+Detailed project rules live in `.agent/rules/` (global, TypeScript, React, shadcn, axios, MVC, commits, design system). Read the relevant rule before changing code. The visual source of truth is `docs/style-guide.md`, based on the reference HTML in `/home/hugo/Documentos/front-base-desing`. The backend API routes are documented in `docs/api-routes.md`; consult it before integrating or creating DTOs.
 
 ## Commands
 
@@ -14,7 +14,7 @@ Detailed project rules live in `.agent/rules/` (global, TypeScript, React, shadc
 - `npm run lint` — ESLint (`dist/` ignored)
 - `npm run format` — Prettier for all `*.ts`/`*.tsx`
 - `npm run typecheck` — **only checks the empty solution tsconfig** (`files: []`), so it passes without checking source. Use `npx tsc -p tsconfig.app.json --noEmit` or `npm run build` instead.
-- No test runner, router, API client, or backend integration is configured yet; do not assume they exist.
+- No test runner, router, API client, or backend integration is configured yet; do not assume they exist. Routes are documented in `docs/api-routes.md`; the live OpenAPI JSON is at `http://localhost:3333/docs/openapi.json`.
 
 ## Structure and wiring
 
