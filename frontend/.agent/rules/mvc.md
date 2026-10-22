@@ -26,6 +26,10 @@ src/
 │   │   └── EditarGalpaoPage.tsx
 │   ├── lotes/
 │   │   └── CadastrarLotePage.tsx
+│   ├── dispositivos/
+│   │   ├── CriarDispositivoPage.tsx
+│   │   ├── EditarDispositivoPage.tsx
+│   │   └── DispositivoLeiturasPage.tsx
 │   └── ...
 │
 ├── components/         # Componentes reutilizáveis
@@ -39,19 +43,26 @@ src/
 │   ├── lotes/
 │   │   ├── CadastrarLoteForm.tsx
 │   │   └── loteSchema.ts
+│   ├── dispositivos/
+│   │   ├── DispositivoForm.tsx
+│   │   └── dispositivoSchema.ts
 │   └── ui/             # Componentes compartilhados, incluindo shadcn/ui
 │
 ├── hooks/              # Hooks de dados por funcionalidade (React Query)
 │   ├── useDashboard.ts
 │   ├── useGalpoes.ts
 │   ├── useGalpaoDetalhe.ts
-│   └── useCadastrarLote.ts
+│   ├── useCadastrarLote.ts
+│   ├── useCriarDispositivo.ts
+│   ├── useEditarDispositivo.ts
+│   └── useDispositivoLeituras.ts
 │
 ├── services/           # Comunicação com API e regras de acesso aos dados
 │   ├── api.ts          # Configuração compartilhada do Axios
 │   ├── authService.ts  # Serviços de autenticação
 │   ├── galpaoService.ts
 │   ├── loteService.ts
+│   ├── dispositivoService.ts
 │   └── ...
 │
 ├── interfaces/         # Interfaces e tipos TypeScript
@@ -59,6 +70,7 @@ src/
 │   ├── dashboard.ts
 │   ├── galpao.ts
 │   ├── lote.ts
+│   ├── dispositivo.ts
 │   └── ...
 │
 ├── lib/                # Funções utilitárias compartilhadas
@@ -144,7 +156,7 @@ Regras obrigatórias:
 - Evite dependências circulares.
 - Não crie uma pasta ou camada adicional sem uma necessidade real.
 - Evite importar arquivos internos de outras funcionalidades quando uma abstração compartilhada for mais apropriada.
-- Ao migrar uma tela, mova tipos para `src/interfaces/` e chamadas HTTP para `src/services/`; não deixe cópias em `src/features/`.
+- Ao migrar uma tela, mova tipos para `src/interfaces/` e chamadas HTTP para `src/services/`; a pasta `src/features/` foi removida e não deve voltar.
 
 ## Estado e tratamento de erros
 
@@ -209,6 +221,19 @@ A funcionalidade de lotes deve seguir esta organização:
 - `hooks/useCadastrarLote.ts`: lista de galpões e mutação de criação com React Query.
 - `services/loteService.ts`: requisições de lotes à API.
 - `interfaces/lote.ts`: tipos de lotes.
+
+A funcionalidade de dispositivos deve seguir esta organização:
+
+- `pages/dispositivos/CriarDispositivoPage.tsx`: cadastro de dispositivo, com diálogo do ID gerado.
+- `pages/dispositivos/EditarDispositivoPage.tsx`: edição do dispositivo (galpão bloqueado).
+- `pages/dispositivos/DispositivoLeiturasPage.tsx`: histórico paginado de leituras.
+- `components/dispositivos/DispositivoForm.tsx`: formulário compartilhado (criação e edição) com React Hook Form + Zod.
+- `components/dispositivos/dispositivoSchema.ts`: schemas Zod de criação e edição.
+- `hooks/useCriarDispositivo.ts`: lista de galpões e mutação de criação com React Query.
+- `hooks/useEditarDispositivo.ts`: localiza o dispositivo (via estado da rota ou varrendo galpões) e mutação de edição.
+- `hooks/useDispositivoLeituras.ts`: leituras paginadas com React Query.
+- `services/dispositivoService.ts`: requisições de dispositivos e leituras à API.
+- `interfaces/dispositivo.ts`: tipos de dispositivos e leituras.
 
 ## Regra principal
 
