@@ -17,18 +17,28 @@ src/
 │   ├── auth/
 │   │   ├── LoginPage.tsx
 │   │   └── RegisterPage.tsx
+│   ├── dashboard/
+│   │   └── DashboardPage.tsx
 │   ├── galpoes/
-│   │   └── GalpoesPage.tsx
+│   │   ├── GalpoesPage.tsx
+│   │   ├── GalpaoDetalhePage.tsx
+│   │   ├── CriarGalpaoPage.tsx
+│   │   └── EditarGalpaoPage.tsx
 │   └── ...
 │
 ├── components/         # Componentes reutilizáveis
 │   ├── login/
 │   │   ├── LoginForm.tsx
 │   │   └── ...
+│   ├── galpoes/
+│   │   ├── GalpaoForm.tsx
+│   │   ├── GalpoesTable.tsx
+│   │   └── galpaoSchema.ts
 │   └── ui/             # Componentes compartilhados, incluindo shadcn/ui
 │
 ├── hooks/              # Hooks de dados por funcionalidade (React Query)
-│   └── useDashboard.ts
+│   ├── useDashboard.ts
+│   └── useGalpoes.ts
 │
 ├── services/           # Comunicação com API e regras de acesso aos dados
 │   ├── api.ts          # Configuração compartilhada do Axios
@@ -168,6 +178,19 @@ A funcionalidade de dashboard deve seguir esta organização:
 - `hooks/useDashboard.ts`: busca e deriva os dados do dashboard com React Query.
 - `services/dashboardService.ts` e `services/galpaoService.ts`: realizam as requisições à API.
 - `interfaces/dashboard.ts` e `interfaces/galpao.ts`: definem os tipos usados pela página.
+
+A funcionalidade de galpões deve seguir esta organização:
+
+- `pages/galpoes/GalpoesPage.tsx`: lista, busca, paginação e exclusão de galpões.
+- `pages/galpoes/GalpaoDetalhePage.tsx`: exibe o detalhe com lotes e dispositivos.
+- `pages/galpoes/CriarGalpaoPage.tsx` e `pages/galpoes/EditarGalpaoPage.tsx`: cadastro e edição.
+- `components/galpoes/GalpaoForm.tsx`: formulário compartilhado com React Hook Form + Zod.
+- `components/galpoes/GalpoesTable.tsx`: tabela da listagem.
+- `components/galpoes/galpaoSchema.ts`: schema Zod e tipo dos valores do formulário.
+- `hooks/useGalpoes.ts` e `hooks/useGalpaoDetalhe.ts`: estado de servidor com React Query.
+- `services/galpaoService.ts`: requisições de galpões à API.
+- `interfaces/galpao.ts`: tipos de galpões.
+- `lib/datas.ts`: formatação e cálculo de datas com dayjs.
 
 ## Regra principal
 

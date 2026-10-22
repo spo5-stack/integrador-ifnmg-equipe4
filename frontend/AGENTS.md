@@ -14,7 +14,7 @@ Detailed project rules live in `.agent/rules/` (global, TypeScript, React, shadc
 - `npm run lint` — ESLint (`dist/` ignored)
 - `npm run format` — Prettier for all `*.ts`/`*.tsx`
 - `npm run typecheck` — **only checks the empty solution tsconfig** (`files: []`), so it passes without checking source. Use `npx tsc -p tsconfig.app.json --noEmit` or `npm run build` instead.
-- No test runner is configured. Routing uses `react-router-dom` in `src/routes`, the shared axios client is `src/services/api.ts`, and auth session state lives in `src/contexts/AuthContext.tsx`. Login, register and dashboard live in `src/pages/`; remaining screens still live under `src/features/` until migrated. Routes are documented in `docs/api-routes.md`; the live OpenAPI JSON is at `http://localhost:3333/docs/openapi.json`.
+- No test runner is configured. Routing uses `react-router-dom` in `src/routes`, the shared axios client is `src/services/api.ts`, and auth session state lives in `src/contexts/AuthContext.tsx`. Login, register, dashboard and galpões live in `src/pages/`; remaining screens still live under `src/features/` until migrated. Routes are documented in `docs/api-routes.md`; the live OpenAPI JSON is at `http://localhost:3333/docs/openapi.json`.
 
 ## Structure and wiring
 
