@@ -7,7 +7,7 @@ import type {
   GalpaoOpcao,
   GalpoesResposta,
   ListarGalpoesParams,
-} from "@/features/galpoes/model/galpao.types"
+} from "@/interfaces/galpao"
 
 const POR_PAGINA_SELECAO = 100
 

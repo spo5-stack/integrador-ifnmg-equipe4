@@ -3,8 +3,8 @@ import type { FormEvent } from "react"
 import { criarDispositivo } from "@/features/dispositivos/model/dispositivo.service"
 import type { ErrosDispositivo } from "@/features/dispositivos/model/dispositivo.validation"
 import { validarCriarDispositivo } from "@/features/dispositivos/model/dispositivo.validation"
-import { listarGalpoesParaSelecao } from "@/features/galpoes/model/galpao.service"
-import type { GalpaoOpcao } from "@/features/galpoes/model/galpao.types"
+import { listarGalpoesParaSelecao } from "@/services/galpaoService"
+import type { GalpaoOpcao } from "@/interfaces/galpao"
 import { getApiErrorMessage, getApiErrorStatus } from "@/services/api"
 
 export function useCriarDispositivoForm(galpaoIdInicial?: string) {

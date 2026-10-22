@@ -22,7 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useGalpaoDetalhe } from "@/features/galpoes/controller/useGalpaoDetalhe"
-import type { LoteDoGalpao } from "@/features/galpoes/model/galpao.types"
+import type { LoteDoGalpao } from "@/interfaces/galpao"
 import { cn } from "@/lib/utils"
 
 const BADGE_BASE = "rounded-full px-3 py-1 text-xs font-semibold"

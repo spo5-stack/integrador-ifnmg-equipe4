@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import type { Galpao } from "@/features/galpoes/model/galpao.types"
+import type { Galpao } from "@/interfaces/galpao"
 import { cn } from "@/lib/utils"
 
 type GalpoesTableProps = {

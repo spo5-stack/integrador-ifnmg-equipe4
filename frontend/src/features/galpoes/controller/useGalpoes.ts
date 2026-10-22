@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react"
-import {
-  excluirGalpao,
-  listarGalpoes,
-} from "@/features/galpoes/model/galpao.service"
-import type {
-  Galpao,
-  GalpoesResposta,
-} from "@/features/galpoes/model/galpao.types"
+import { excluirGalpao, listarGalpoes } from "@/services/galpaoService"
+import type { Galpao, GalpoesResposta } from "@/interfaces/galpao"
 import { getApiErrorMessage, getApiErrorStatus } from "@/services/api"
 
 const GALPOES_POR_PAGINA = 10

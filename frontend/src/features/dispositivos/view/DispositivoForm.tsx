@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select"
 import type { ErrosDispositivo } from "@/features/dispositivos/model/dispositivo.validation"
 import type { StatusRegistro } from "@/features/dispositivos/model/dispositivo.types"
-import type { GalpaoOpcao } from "@/features/galpoes/model/galpao.types"
+import type { GalpaoOpcao } from "@/interfaces/galpao"
 import { cn } from "@/lib/utils"
 
 type DispositivoFormProps = {

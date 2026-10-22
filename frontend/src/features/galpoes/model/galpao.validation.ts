@@ -1,4 +1,4 @@
-import type { CriarGalpaoDados } from "@/features/galpoes/model/galpao.types"
+import type { CriarGalpaoDados } from "@/interfaces/galpao"
 
 export type ErrosFormularioGalpao = {
   nome?: string

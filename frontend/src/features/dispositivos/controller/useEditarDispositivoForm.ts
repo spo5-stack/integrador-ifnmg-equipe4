@@ -11,7 +11,7 @@ import type {
 } from "@/features/dispositivos/model/dispositivo.types"
 import type { ErrosDispositivo } from "@/features/dispositivos/model/dispositivo.validation"
 import { validarEditarDispositivo } from "@/features/dispositivos/model/dispositivo.validation"
-import { listarGalpoesParaSelecao } from "@/features/galpoes/model/galpao.service"
+import { listarGalpoesParaSelecao } from "@/services/galpaoService"
 import { getApiErrorMessage, getApiErrorStatus } from "@/services/api"
 
 type EstadoInicialEdicao = {

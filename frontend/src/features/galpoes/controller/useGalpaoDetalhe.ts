@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { obterGalpao } from "@/features/galpoes/model/galpao.service"
-import type { GalpaoDetalhe } from "@/features/galpoes/model/galpao.types"
+import { obterGalpao } from "@/services/galpaoService"
+import type { GalpaoDetalhe } from "@/interfaces/galpao"
 import { getApiErrorMessage, getApiErrorStatus } from "@/services/api"
 
 export function useGalpaoDetalhe(id: string | undefined) {

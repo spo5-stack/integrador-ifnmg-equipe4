@@ -1,7 +1,7 @@
 import { useState } from "react"
 import type { FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
-import { criarGalpao } from "@/features/galpoes/model/galpao.service"
+import { criarGalpao } from "@/services/galpaoService"
 import type { ErrosFormularioGalpao } from "@/features/galpoes/model/galpao.validation"
 import { validarGalpao } from "@/features/galpoes/model/galpao.validation"
 import { getApiErrorMessage, getApiErrorStatus } from "@/services/api"

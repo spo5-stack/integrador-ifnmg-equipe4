@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react"
 import type { FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
-import {
-  listarGalpoesParaSelecao,
-  obterGalpao,
-} from "@/features/galpoes/model/galpao.service"
-import type { GalpaoOpcao } from "@/features/galpoes/model/galpao.types"
+import { listarGalpoesParaSelecao, obterGalpao } from "@/services/galpaoService"
+import type { GalpaoOpcao } from "@/interfaces/galpao"
 import { criarLote } from "@/features/lotes/model/lote.service"
 import type { ErrosLote } from "@/features/lotes/model/lote.validation"
 import { validarLote } from "@/features/lotes/model/lote.validation"
