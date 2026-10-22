@@ -14,11 +14,12 @@ Detailed project rules live in `.agent/rules/` (global, TypeScript, React, shadc
 - `npm run lint` — ESLint (`dist/` ignored)
 - `npm run format` — Prettier for all `*.ts`/`*.tsx`
 - `npm run typecheck` — **only checks the empty solution tsconfig** (`files: []`), so it passes without checking source. Use `npx tsc -p tsconfig.app.json --noEmit` or `npm run build` instead.
-- No test runner, router, API client, or backend integration is configured yet; do not assume they exist. Routes are documented in `docs/api-routes.md`; the live OpenAPI JSON is at `http://localhost:3333/docs/openapi.json`.
+- No test runner is configured. Routing uses `react-router-dom` in `src/routes`, the shared axios client is `src/services/api.ts`, and auth lives in `src/features/auth`. Routes are documented in `docs/api-routes.md`; the live OpenAPI JSON is at `http://localhost:3333/docs/openapi.json`.
 
 ## Structure and wiring
 
 - `src/main.tsx` mounts React in `StrictMode`, wraps `App` in `ThemeProvider`, and imports `src/index.css`.
+- `App` provides `BrowserRouter` and `AuthProvider`; public routes are `/login` and `/cadastro`, and `/` is private.
 - `@/*` maps to `src/*` in both Vite and `tsconfig.app.json`. Keep both aliases in sync if changed.
 - UI primitives live in `src/components/ui/`. Add shadcn components with `npx shadcn@latest add <name>`; `components.json` defines the `base-nova` style with `rsc: false`.
 - This shadcn style uses `@base-ui/react` primitives, not Radix. Follow `src/components/ui/button.tsx` as the reference.
