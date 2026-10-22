@@ -497,6 +497,24 @@ export type Dashboard = {
 export type ErroApi = { erro: string }
 ```
 
+## Modificações necessárias no backend
+
+As lacunas abaixo foram identificadas durante a implementação das telas da task
+03 no frontend. Elas **ainda não foram aplicadas** ao backend e estão detalhadas
+em arquivos próprios:
+
+- [01 — Validar capacidade ao criar lote](backend-changes/01-validate-lote-capacity-on-create.md)
+  — alta prioridade; o frontend já bloqueia, mas a API aceita quantidade acima da
+  capacidade.
+- [02 — Validar capacidade ao atualizar lote](backend-changes/02-validate-lote-capacity-on-update.md)
+  — média prioridade; fecha o bypass pelo `PUT /api/lotes/{id}`.
+- [03 — Adicionar busca de dispositivo por ID](backend-changes/03-add-get-device-by-id.md)
+  — média prioridade; remove a busca sequencial por galpões no fallback da tela
+  de edição.
+
+O índice com a proposta de commits está em
+[`backend-changes/README.md`](backend-changes/README.md).
+
 ## Observações para o frontend
 
 - `fase` e `statusLuminosidade` são strings calculadas pelo backend e não têm
