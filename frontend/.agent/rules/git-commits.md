@@ -12,6 +12,7 @@ description: "Use ao preparar, dividir ou escrever mensagens de commit."
 - Limite o assunto a aproximadamente 72 caracteres. Use o corpo somente para explicar o motivo quando necessário.
 - Faça commits pequenos e coesos: um commit por mudança lógica. Não misture código, documentação e configuração sem relação.
 - Antes de commitar, revise `git status`, `git diff` e `git diff --cached` e faça stage apenas dos arquivos intencionais.
+- Sempre mostre os arquivos alterados e a mensagem de commit proposta e peça confirmação explícita ao usuário. Não crie o commit sem essa confirmação.
 - Nunca commite `node_modules/`, `dist/`, segredos, `.env` locais ou arquivos gerados.
 - Não use `--amend`, force-push ou commits vazios sem pedido explícito.
 - Não faça push sem autorização explícita.
