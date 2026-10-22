@@ -1,46 +1,144 @@
 ---
 trigger: always_on
-description: "Arquitetura MVC inspirada em React: separação entre model, controller e view por feature."
+description: "Arquitetura frontend simplificada com pages, components, services e interfaces."
 ---
 
-# Arquitetura MVC no frontend
+# Arquitetura simplificada no frontend
 
-React não é um framework MVC, mas o projeto adota uma separação inspirada em MVC para evitar componentes gordos e mistura de responsabilidades.
+O projeto deve utilizar uma arquitetura simples, organizada e de fácil manutenção, separando páginas, componentes visuais, serviços de comunicação com a API e interfaces TypeScript.
 
-## Estrutura por feature
+O objetivo é evitar componentes muito grandes, duplicação de código e mistura de responsabilidades, sem adicionar camadas desnecessárias.
+
+## Estrutura de pastas
 
 ```text
 src/
-  features/
-    <feature>/
-      model/        # tipos, DTOs, regras de negócio e serviços/axios
-      controller/   # hooks que orquestram estado, efeitos e ações
-      view/         # componentes de apresentação
-  components/       # UI compartilhada, incluindo ui/ do shadcn
-  services/         # axios compartilhado e integrações transversais
-  lib/              # utilitários puros compartilhados
+├── pages/              # Páginas da aplicação
+│   ├── LoginPage.tsx
+│   └── ...
+│
+├── components/         # Componentes reutilizáveis
+│   ├── login/
+│   │   ├── LoginForm.tsx
+│   │   └── ...
+│   └── ui/             # Componentes compartilhados, incluindo shadcn/ui
+│
+├── services/           # Comunicação com API e regras de acesso aos dados
+│   ├── api.ts          # Configuração compartilhada do Axios
+│   ├── authService.ts  # Serviços de autenticação
+│   └── ...
+│
+├── interfaces/         # Interfaces e tipos TypeScript
+│   ├── auth.ts
+│   └── ...
+│
+├── lib/                # Funções utilitárias compartilhadas
+└── ...
 ```
+
+A estrutura acima é uma referência. Crie arquivos e pastas adicionais somente quando forem necessários.
 
 ## Responsabilidades
 
-- **Model**: tipos de domínio, contratos de API, chamadas axios, validações e transformações de dados. Não importa React, componentes ou hooks.
-- **Controller**: custom hooks (por exemplo, `useUsuariosController`) que mantêm estado da tela, disparam chamadas do model, controlam loading/erro e expõem ações e dados para a view.
-- **View**: componentes de apresentação que recebem props e renderizam JSX. Não fazem HTTP, não conhecem detalhes do backend e não concentram regra de negócio.
-- **Page/composição**: conecta controller e view. Pode cuidar de layout e composição, mas não deve duplicar lógica de dados.
+### 1. Pages
+
+- A pasta `pages/` contém as páginas completas da aplicação.
+- Cada página deve representar uma rota ou tela, como `LoginPage.tsx`, `DashboardPage.tsx` ou `UsuariosPage.tsx`.
+- As páginas são responsáveis por organizar os componentes necessários para montar a tela.
+- Podem controlar o estado específico da página quando isso for simples.
+- Quando a lógica crescer, extraia-a para funções ou hooks específicos, sem criar camadas obrigatórias.
+- Evite colocar toda a implementação visual e toda a lógica de negócio em uma única página.
+
+### 2. Components
+
+- A pasta `components/` contém os componentes visuais da aplicação.
+- Componentes específicos de uma funcionalidade devem ficar em subpastas, como `components/login/LoginForm.tsx`.
+- Componentes compartilhados entre diferentes funcionalidades devem ficar diretamente em `components/` ou na pasta apropriada, como `components/ui/`.
+- Utilize props para receber dados e callbacks.
+- Componentes de formulário podem controlar seus próprios campos e estados locais.
+- Evite duplicar componentes com a mesma finalidade.
+- Não realize chamadas HTTP diretamente nos componentes visuais. Utilize os serviços da pasta `services/`.
+
+### 3. Services
+
+- A pasta `services/` centraliza a comunicação com a API e outras integrações externas.
+- Utilize `services/api.ts` para configurar a instância compartilhada do Axios, incluindo URL base e configurações comuns.
+- Crie serviços por funcionalidade ou recurso, como `authService.ts`, `usuarioService.ts` e `produtoService.ts`.
+- Cada serviço deve concentrar as funções responsáveis por acessar os endpoints correspondentes.
+- Não duplique configurações de Axios em diferentes arquivos.
+- Os serviços devem retornar dados tipados e propagar erros para que a camada responsável pela interface possa tratá-los.
+- Não coloque elementos JSX ou componentes React nos serviços.
+- Não coloque tokens, senhas ou outras credenciais diretamente no código-fonte.
+
+### 4. Interfaces
+
+- A pasta `interfaces/` contém interfaces, tipos e contratos utilizados no projeto.
+- Organize os arquivos por domínio ou funcionalidade, como `auth.ts`, `usuario.ts` e `produto.ts`.
+- Defina os formatos dos dados enviados e recebidos pela API.
+- Crie interfaces para requisições, respostas e entidades quando necessário.
+- Reutilize as interfaces existentes em vez de declarar os mesmos formatos repetidamente.
+- Utilize `type` quando for mais adequado do que `interface`.
+- Evite utilizar `any` quando for possível definir um tipo explícito.
+- Não coloque chamadas HTTP ou lógica de interface nesses arquivos.
+
+### 5. Lib
+
+- A pasta `lib/` deve conter funções utilitárias genéricas e reutilizáveis.
+- Utilize-a para funções puras que não pertencem exclusivamente a uma página ou serviço específico.
+- Não utilize essa pasta como destino genérico para qualquer código sem organização.
 
 ## Regras de dependência
 
-- O fluxo permitido é `view -> controller -> model`.
-- Model não pode importar de view nem de controller.
-- View não pode importar axios nem serviços de dados diretamente.
-- Controllers podem usar React e hooks; models devem ser TypeScript puro e testáveis sem DOM.
-- Evite dependências circulares entre features. Compartilhe apenas o que for realmente transversal em `src/components`, `src/lib` ou `src/services`.
-- Uma feature não deve importar arquivos internos de outra feature. Se precisar, promova o código para uma camada compartilhada.
+O fluxo recomendado é:
 
-## Estado e dados
+`Pages → Components → Services → API`
 
-- O controller é a fonte de estado da feature. Evite espalhar o mesmo estado em vários componentes.
-- Use estado global/contexto apenas para dados realmente globais (tema, sessão). Dados de uma feature ficam na própria feature.
-- Não duplique dados do servidor em vários modelos. Defina um model/serviço por recurso.
-- Tratamento de loading, erro e vazio pertence ao controller e é exposto para a view.
-- Se um componente começar a buscar dados, transformar dados e renderizar uma tela inteira, divida imediatamente em model + controller + view.
+As interfaces podem ser importadas pelas páginas, componentes e serviços, conforme a necessidade.
+
+Regras obrigatórias:
+
+- Componentes não devem importar serviços para executar requisições HTTP diretamente.
+- Páginas ou hooks podem chamar os serviços e repassar os resultados aos componentes por props.
+- Serviços não devem importar páginas ou componentes React.
+- Interfaces não devem depender de componentes, páginas ou serviços.
+- Evite dependências circulares.
+- Não crie uma pasta ou camada adicional sem uma necessidade real.
+- Evite importar arquivos internos de outras funcionalidades quando uma abstração compartilhada for mais apropriada.
+
+## Estado e tratamento de erros
+
+- Utilize `useState` e outros hooks do React quando necessário.
+- Mantenha o estado próximo de onde ele é utilizado.
+- Não crie estado global para dados usados apenas em uma página.
+- Estados de carregamento, sucesso e erro devem ser tratados pela página ou por um hook quando houver necessidade de compartilhar a lógica.
+- Os componentes devem receber as informações necessárias para exibir carregamento, mensagens de erro e resultados vazios.
+- Evite duplicar dados retornados pela API sem necessidade.
+
+## Padrões de código
+
+- Utilize TypeScript e tipagem explícita.
+- Siga os padrões de nomenclatura já existentes no projeto.
+- Utilize nomes descritivos para arquivos, funções, variáveis e interfaces.
+- Componentes React devem utilizar PascalCase, como `LoginForm.tsx`.
+- Serviços devem utilizar uma nomenclatura consistente, como `authService.ts`.
+- Mantenha funções pequenas e com responsabilidades claras.
+- Reaproveite os componentes existentes, incluindo os componentes do shadcn/ui.
+- Não adicione bibliotecas, abstrações ou padrões arquiteturais sem necessidade.
+
+## Exemplo de organização de uma funcionalidade
+
+A funcionalidade de login deve seguir esta organização:
+
+- `pages/LoginPage.tsx`: organiza a página de login.
+- `components/login/LoginForm.tsx`: renderiza o formulário e coleta os dados.
+- `services/authService.ts`: realiza a requisição de login à API.
+- `services/api.ts`: configura a comunicação HTTP compartilhada.
+- `interfaces/auth.ts`: define os tipos dos dados de login e da resposta da API.
+
+A página pode chamar o serviço diretamente ou utilizar um hook específico, caso a lógica cresça. Não é obrigatório criar controllers, models ou hooks para funcionalidades simples.
+
+## Regra principal
+
+Priorize simplicidade, clareza, reutilização e manutenção.
+
+A arquitetura deve facilitar a localização do código e a separação de responsabilidades, sem transformar tarefas simples em estruturas complexas. Antes de criar novos arquivos ou abstrações, verifique se já existe uma solução adequada no projeto.

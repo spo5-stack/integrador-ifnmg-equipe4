@@ -20,6 +20,7 @@ description: "Regras globais do frontend: escopo, stack, comandos e convenções
 - Vite 8, React 19, TypeScript 6, Tailwind CSS 4 e shadcn/ui com estilo `base-nova`.
 - Primitivos de UI: `@base-ui/react` (não Radix). Ícones: `lucide-react`. HTTP: `axios` (nunca `fetch`), com cliente compartilhado em `src/services/api.ts`. Rotas com `react-router-dom` em `src/routes`.
 - Fontes: Inter para corpo/labels e Manrope para títulos. Referência visual em `docs/style-guide.md`.
+- Datas: `dayjs`. Formulários: `react-hook-form` + `zod` + `@hookform/resolvers`. Estado de servidor e requisições: `@tanstack/react-query`. Instale a dependência antes do primeiro uso e não substitua por alternativas.
 - O alias `@/*` aponta para `src/*`.
 
 ## Convenções do projeto

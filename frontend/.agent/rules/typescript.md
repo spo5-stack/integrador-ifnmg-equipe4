@@ -16,3 +16,6 @@ description: "Regras de TypeScript para tipos, imports, APIs e segurança de tip
 - Seja explícito nas fronteiras (props, retornos de hooks, respostas externas) e deixe a inferência trabalhar em valores locais óbvios.
 - Não use non-null assertion (`!`) para esconder dados ausentes. Trate `null`/`undefined` com narrowing ou valores padrão.
 - Prefira `satisfies` para validar objetos de configuração sem perder a inferência.
+- Use `dayjs` para criar, interpretar, comparar, calcular e formatar datas. Não use `Date` para manipulação manual, `date-fns` ou formatação caseira.
+- Trafegue datas com a API em ISO 8601 e formate-as apenas na borda de apresentação. Para pt-BR, importe o locale `pt-br` do dayjs.
+- Derive tipos de formulário do schema Zod com `z.infer<typeof schema>`; não mantenha o tipo e o schema duplicados.
