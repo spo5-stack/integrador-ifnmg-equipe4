@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom"
 import { AuthenticatedLayout } from "@/components/layout/AuthenticatedLayout"
-import { DashboardView } from "@/features/dashboard/view/DashboardView"
+import { DashboardPage } from "@/pages/dashboard/DashboardPage"
 import { CriarGalpaoView } from "@/features/galpoes/view/CriarGalpaoView"
 import { EditarGalpaoView } from "@/features/galpoes/view/EditarGalpaoView"
 import { GalpaoDetalheView } from "@/features/galpoes/view/GalpaoDetalheView"
@@ -24,7 +24,7 @@ export function AppRoutes() {
 
       <Route element={<PrivateRoute />}>
         <Route element={<AuthenticatedLayout />}>
-          <Route element={<DashboardView />} index />
+          <Route element={<DashboardPage />} index />
           <Route element={<GalpoesView />} path="galpoes" />
           <Route element={<CriarGalpaoView />} path="galpoes/novo" />
           <Route

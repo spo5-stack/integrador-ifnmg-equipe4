@@ -7,7 +7,6 @@ import {
   Cpu,
   Warehouse,
 } from "lucide-react"
-import type { LucideIcon } from "lucide-react"
 import { Link } from "react-router-dom"
 import { RequestError } from "@/components/feedback/RequestError"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -20,9 +19,10 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useAuth } from "@/contexts/AuthContext"
-import { useDashboard } from "@/features/dashboard/controller/useDashboard"
-import type { DashboardResumo } from "@/features/dashboard/model/dashboard.types"
+import { useDashboard } from "@/hooks/useDashboard"
 import { cn } from "@/lib/utils"
+import type { DashboardResumo } from "@/interfaces/dashboard"
+import type { LucideIcon } from "lucide-react"
 
 type IndicadorChave = keyof Pick<
   DashboardResumo,
@@ -112,7 +112,7 @@ function DashboardSkeleton() {
   )
 }
 
-export function DashboardView() {
+export function DashboardPage() {
   const { usuario } = useAuth()
   const { dados, galpoesRecentes, isLoading, erro, recarregar } = useDashboard()
   const iniciais = iniciaisDoUsuario(usuario?.nome)
