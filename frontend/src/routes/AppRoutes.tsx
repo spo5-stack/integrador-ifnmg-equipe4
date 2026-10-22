@@ -1,7 +1,9 @@
 import { Navigate, Route, Routes } from "react-router-dom"
-import { AuthHomeView } from "@/features/auth/view/AuthHomeView"
+import { AuthenticatedLayout } from "@/components/layout/AuthenticatedLayout"
 import { LoginView } from "@/features/auth/view/LoginView"
 import { RegisterView } from "@/features/auth/view/RegisterView"
+import { DashboardView } from "@/features/dashboard/view/DashboardView"
+import { GalpoesView } from "@/features/galpoes/view/GalpoesView"
 import { PrivateRoute } from "@/routes/PrivateRoute"
 import { PublicRoute } from "@/routes/PublicRoute"
 
@@ -14,7 +16,10 @@ export function AppRoutes() {
       </Route>
 
       <Route element={<PrivateRoute />}>
-        <Route element={<AuthHomeView />} path="/" />
+        <Route element={<AuthenticatedLayout />}>
+          <Route element={<DashboardView />} index />
+          <Route element={<GalpoesView />} path="galpoes" />
+        </Route>
       </Route>
 
       <Route element={<Navigate replace to="/" />} path="*" />
