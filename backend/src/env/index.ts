@@ -8,6 +8,7 @@ const envSchema = z.object({
 		.enum(['development', 'test', 'production'])
 		.default('development'),
 	API_URL: z.string().default('http://localhost:3333'),
+	CORS_ORIGIN: z.string().default('http://localhost:5173'),
 	DATABASE_URL: z.string(),
 	JWT_SECRET: z.string(),
 })

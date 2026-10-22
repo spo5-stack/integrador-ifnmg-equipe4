@@ -1,3 +1,4 @@
+import cors from '@fastify/cors'
 import jwt from '@fastify/jwt'
 import fastifySwagger from '@fastify/swagger'
 import scalarFastifyApiReference from '@scalar/fastify-api-reference'
@@ -37,6 +38,10 @@ export const app = fastify({
 
 app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
+
+app.register(cors, {
+	origin: env.CORS_ORIGIN,
+})
 
 app.register(jwt, { secret: env.JWT_SECRET })
 
