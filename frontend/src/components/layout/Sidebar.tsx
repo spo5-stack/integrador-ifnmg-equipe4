@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom"
 import { LogOut, Settings, SunMedium } from "lucide-react"
 import { navItems } from "@/components/layout/navigation"
-import { useAuth } from "@/features/auth/controller/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
 import { cn } from "@/lib/utils"
 
 export function Sidebar() {

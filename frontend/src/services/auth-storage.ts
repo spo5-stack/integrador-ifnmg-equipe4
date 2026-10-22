@@ -1,4 +1,4 @@
-import type { AuthSession } from "@/features/auth/model/auth.types"
+import type { AuthSession } from "@/interfaces/auth"
 
 const STORAGE_KEY = "granja.auth.session"
 

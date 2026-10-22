@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom"
-import { useAuth } from "@/features/auth/controller/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
 
 type LocationState = {
   from?: {

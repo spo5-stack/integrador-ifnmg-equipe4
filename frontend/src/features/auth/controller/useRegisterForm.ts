@@ -1,7 +1,7 @@
 import { useState } from "react"
 import type { ChangeEvent, FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "@/features/auth/controller/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
 import { getApiErrorMessage, getApiErrorStatus } from "@/services/api"
 
 type RegisterFormErrors = {

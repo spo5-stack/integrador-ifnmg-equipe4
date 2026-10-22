@@ -1,15 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import type { ReactNode } from "react"
-import type {
-  AuthSession,
-  LoginDados,
-  RegistrarDados,
-  Usuario,
-} from "@/features/auth/model/auth.types"
-import {
-  login as loginRequest,
-  register as registerRequest,
-} from "@/features/auth/model/auth.service"
+import type { AuthSession, RegistrarDados, Usuario } from "@/interfaces/auth"
+import { register as registerRequest } from "@/services/authService"
 import {
   clearStoredSession,
   readStoredSession,
@@ -19,7 +11,7 @@ import {
 type AuthContextValue = {
   usuario: Usuario | null
   isAuthenticated: boolean
-  login: (dados: LoginDados, remember: boolean) => Promise<void>
+  signIn: (session: AuthSession, remember: boolean) => void
   register: (dados: RegistrarDados) => Promise<void>
   logout: () => void
 }
@@ -45,10 +37,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       window.removeEventListener("auth:unauthorized", handleUnauthorized)
   }, [])
 
-  async function login(dados: LoginDados, remember: boolean): Promise<void> {
-    const response = await loginRequest(dados)
-    saveSession(response, remember)
-    setSession(response)
+  function signIn(nextSession: AuthSession, remember: boolean): void {
+    saveSession(nextSession, remember)
+    setSession(nextSession)
   }
 
   async function register(dados: RegistrarDados): Promise<void> {
@@ -65,7 +56,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const value: AuthContextValue = {
     usuario: session?.usuario ?? null,
     isAuthenticated: session !== null,
-    login,
+    signIn,
     register,
     logout,
   }

@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useAuth } from "@/features/auth/controller/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
 import { useDashboard } from "@/features/dashboard/controller/useDashboard"
 import type { DashboardResumo } from "@/features/dashboard/model/dashboard.types"
 import { cn } from "@/lib/utils"
