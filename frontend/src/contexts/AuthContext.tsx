@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import type { ReactNode } from "react"
-import type { AuthSession, RegistrarDados, Usuario } from "@/interfaces/auth"
-import { register as registerRequest } from "@/services/authService"
+import type { AuthSession, Usuario } from "@/interfaces/auth"
 import {
   clearStoredSession,
   readStoredSession,
@@ -12,7 +11,6 @@ type AuthContextValue = {
   usuario: Usuario | null
   isAuthenticated: boolean
   signIn: (session: AuthSession, remember: boolean) => void
-  register: (dados: RegistrarDados) => Promise<void>
   logout: () => void
 }
 
@@ -42,12 +40,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setSession(nextSession)
   }
 
-  async function register(dados: RegistrarDados): Promise<void> {
-    const response = await registerRequest(dados)
-    saveSession(response, false)
-    setSession(response)
-  }
-
   function logout(): void {
     clearStoredSession()
     setSession(null)
@@ -57,7 +49,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     usuario: session?.usuario ?? null,
     isAuthenticated: session !== null,
     signIn,
-    register,
     logout,
   }
 

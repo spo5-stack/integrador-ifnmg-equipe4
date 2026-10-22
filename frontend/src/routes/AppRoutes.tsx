@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom"
 import { AuthenticatedLayout } from "@/components/layout/AuthenticatedLayout"
-import { RegisterView } from "@/features/auth/view/RegisterView"
 import { DashboardView } from "@/features/dashboard/view/DashboardView"
 import { CriarGalpaoView } from "@/features/galpoes/view/CriarGalpaoView"
 import { EditarGalpaoView } from "@/features/galpoes/view/EditarGalpaoView"
@@ -11,6 +10,7 @@ import { CriarDispositivoView } from "@/features/dispositivos/view/CriarDisposit
 import { EditarDispositivoView } from "@/features/dispositivos/view/EditarDispositivoView"
 import { DispositivoLeiturasView } from "@/features/dispositivos/view/DispositivoLeiturasView"
 import { LoginPage } from "@/pages/LoginPage"
+import { RegisterPage } from "@/pages/RegisterPage"
 import { PrivateRoute } from "@/routes/PrivateRoute"
 import { PublicRoute } from "@/routes/PublicRoute"
 
@@ -19,7 +19,7 @@ export function AppRoutes() {
     <Routes>
       <Route element={<PublicRoute />}>
         <Route element={<LoginPage />} path="/login" />
-        <Route element={<RegisterView />} path="/cadastro" />
+        <Route element={<RegisterPage />} path="/cadastro" />
       </Route>
 
       <Route element={<PrivateRoute />}>
