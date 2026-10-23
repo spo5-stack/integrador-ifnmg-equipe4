@@ -5,8 +5,10 @@ import {
   Bird,
   Building2,
   Cpu,
+  Lightbulb,
   Pencil,
   Plus,
+  SunMedium,
 } from "lucide-react"
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import { RequestError } from "@/components/feedback/RequestError"
@@ -33,6 +35,12 @@ const ESTILOS_FASE: Record<string, string> = {
   INICIAL: "bg-accent text-accent-foreground",
   CRESCIMENTO: "bg-secondary text-secondary-foreground",
   PRODUCAO: "bg-primary text-primary-foreground",
+}
+
+const FAIXA_IDEAL_POR_FASE: Record<string, { min: number; max: number }> = {
+  INICIAL: { min: 70, max: 100 },
+  CRESCIMENTO: { min: 50, max: 70 },
+  PRODUCAO: { min: 30, max: 50 },
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -64,17 +72,18 @@ function FaseBadge({ fase }: { fase: string }) {
 }
 
 function StatusLuminosidadeBadge({ status }: { status: string }) {
+  const statusUpper = status.toUpperCase()
   return (
     <span
       className={cn(
         BADGE_BASE,
-        status.toUpperCase().includes("ADEQUAD")
-          ? "bg-secondary text-secondary-foreground"
-          : status.toUpperCase().includes("ATEN")
-            ? "bg-accent text-accent-foreground"
+        statusUpper === "ADEQUADO"
+          ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+          : statusUpper === "ABAIXO" || statusUpper === "ACIMA"
+            ? "bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400"
             : "bg-muted text-muted-foreground"
       )}
-      title="Status de luminosidade calculado pelo backend com base na fase do lote"
+      title="Status de luminosidade calculado pelo backend com base na faixa ideal da fase do lote"
     >
       {status}
     </span>
@@ -266,7 +275,7 @@ export function GalpaoDetalhePage() {
         <>
           <section
             aria-label="Resumo do galpão"
-            className="grid gap-6 md:grid-cols-2"
+            className="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
           >
             <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
@@ -309,6 +318,56 @@ export function GalpaoDetalhePage() {
               </p>
               <p className="text-sm text-muted-foreground">cadastrados</p>
             </div>
+
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm md:col-span-2 xl:col-span-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <SunMedium aria-hidden="true" className="size-4 text-primary" />
+                <h2 className="text-[10px] font-bold tracking-widest uppercase">
+                  Faixa ideal de luminosidade
+                </h2>
+              </div>
+              {loteAtivoStatus ? (
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">
+                      Fase: {loteAtivoStatus.fase}
+                    </span>
+                    <span className="font-heading text-lg font-extrabold">
+                      {FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase]
+                        ? `${FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase].min}% - ${FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase].max}%`
+                        : "Não definida"}
+                    </span>
+                  </div>
+                  <div className="rounded-lg bg-muted/60 p-3 text-xs text-muted-foreground">
+                    <p className="font-medium text-foreground">
+                      Como interpretar
+                    </p>
+                    <p className="mt-1">
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                        ADEQUADO
+                      </span>{" "}
+                      = dentro da faixa ideal para a fase atual.
+                    </p>
+                    <p className="mt-1">
+                      <span className="font-semibold text-red-600 dark:text-red-400">
+                        ABAIXO
+                      </span>{" "}
+                      = luminosidade menor que o mínimo recomendado.
+                    </p>
+                    <p className="mt-1">
+                      <span className="font-semibold text-red-600 dark:text-red-400">
+                        ACIMA
+                      </span>{" "}
+                      = luminosidade maior que o máximo recomendado.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-muted-foreground">
+                  Cadastre/ative um lote para exibir a faixa ideal por fase.
+                </p>
+              )}
+            </div>
           </section>
 
           <section
@@ -332,17 +391,17 @@ export function GalpaoDetalhePage() {
           </section>
 
           <section
-            aria-label="Dispositivos do galpão"
+            aria-label="Monitoramento de luminosidade por dispositivo"
             className="overflow-hidden rounded-xl border border-border bg-card shadow-sm"
           >
             <div className="flex items-center justify-between gap-4 px-6 py-5">
               <div>
                 <h2 className="font-heading text-lg font-extrabold">
-                  Dispositivos
+                  Monitoramento de luminosidade
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Situação de luminosidade calculada pelo backend com base na
-                  fase do lote.
+                  Comparação entre leitura atual e faixa ideal para a fase do
+                  lote.
                 </p>
               </div>
               <Link
@@ -366,11 +425,12 @@ export function GalpaoDetalhePage() {
                 <TableHeader>
                   <TableRow>
                     {[
-                      "Nome",
+                      "Dispositivo",
                       "Modelo",
                       "Status",
-                      "Última Leitura",
-                      "Situação (luminosidade)",
+                      "Leitura atual",
+                      "Faixa ideal (fase)",
+                      "Situação",
                       "Ações",
                     ].map((coluna) => (
                       <TableHead
@@ -388,6 +448,9 @@ export function GalpaoDetalhePage() {
                       statusMonitoramento?.dispositivos.find(
                         (item) => item.id === dispositivo.id
                       )
+                    const faixaIdeal = loteAtivoStatus
+                      ? FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase]
+                      : null
 
                     return (
                       <TableRow key={dispositivo.id}>
@@ -402,21 +465,40 @@ export function GalpaoDetalhePage() {
                         </TableCell>
                         <TableCell className="px-6 py-4">
                           {dispositivo.ultimaLeitura ? (
-                            <span className="flex flex-col">
-                              <span className="font-medium">
-                                {dispositivo.ultimaLeitura.valor.toLocaleString(
-                                  "pt-BR"
-                                )}
-                                %
+                            <div className="flex items-center gap-2">
+                              <Lightbulb
+                                aria-hidden="true"
+                                className="size-4 text-primary"
+                              />
+                              <span className="flex flex-col">
+                                <span className="font-heading text-base font-extrabold">
+                                  {dispositivo.ultimaLeitura.valor.toLocaleString(
+                                    "pt-BR"
+                                  )}
+                                  %
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {formatarDataHora(
+                                    dispositivo.ultimaLeitura.criadoEm
+                                  )}
+                                </span>
                               </span>
-                              <span className="text-xs text-muted-foreground">
-                                {formatarDataHora(
-                                  dispositivo.ultimaLeitura.criadoEm
-                                )}
-                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">
+                              Sem leitura
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          {faixaIdeal ? (
+                            <span className="text-sm font-medium">
+                              {faixaIdeal.min}% - {faixaIdeal.max}%
                             </span>
                           ) : (
-                            "—"
+                            <span className="text-sm text-muted-foreground">
+                              —
+                            </span>
                           )}
                         </TableCell>
                         <TableCell className="px-6 py-4">
