@@ -9,6 +9,6 @@ export type NavItem = {
 
 export const navItems: NavItem[] = [
   { label: "Dashboard", icon: LayoutDashboard, to: "/" },
-  { label: "Cadastrar Lote", icon: CirclePlus },
+  { label: "Cadastrar Lote", icon: CirclePlus, to: "/galpoes" },
   { label: "Galpões", icon: Warehouse, to: "/galpoes" },
 ]
