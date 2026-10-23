@@ -62,15 +62,20 @@ export function Sidebar() {
       </nav>
 
       <div className="mt-auto flex flex-col gap-1 px-3">
-        <button
-          className="flex cursor-not-allowed items-center gap-3 rounded-lg px-4 py-3 text-left font-heading text-sm font-semibold text-sidebar-foreground/55 opacity-70"
-          disabled
-          title="Disponível em breve"
-          type="button"
+        <NavLink
+          className={({ isActive }) =>
+            cn(
+              "flex items-center gap-3 rounded-lg px-4 py-3 font-heading text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none",
+              isActive
+                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                : "text-sidebar-foreground/65 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+            )
+          }
+          to="/perfil"
         >
           <Settings aria-hidden="true" className="size-5" />
           Configurações
-        </button>
+        </NavLink>
         <button
           className="flex items-center gap-3 rounded-lg px-4 py-3 text-left font-heading text-sm font-semibold text-sidebar-foreground/65 transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
           onClick={logout}

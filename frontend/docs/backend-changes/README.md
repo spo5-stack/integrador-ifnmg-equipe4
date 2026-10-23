@@ -12,12 +12,14 @@ com passos de implementação, critérios de aceite e impacto no frontend.
 | 01  | Validar quantidade do lote contra a capacidade na criação     | Alta       | Pendente | O frontend já bloqueia, mas a API ainda aceita quantidade acima da capacidade  |
 | 02  | Validar quantidade do lote contra a capacidade na atualização | Média      | Pendente | Fecha o bypass via `PUT /api/lotes/{id}`                                       |
 | 03  | Adicionar `GET /api/dispositivos/{id}`                        | Média      | Pendente | Remove a busca sequencial em todos os galpões ao abrir a edição por URL direta |
+| 04  | Endpoints de recuperação e redefinição de senha               | Alta       | Pendente | As telas de recuperação ficam UI-only (simuladas) até existirem os endpoints  |
 
 ## Arquivos
 
 - [01 — Validar capacidade ao criar lote](01-validate-lote-capacity-on-create.md)
 - [02 — Validar capacidade ao atualizar lote](02-validate-lote-capacity-on-update.md)
 - [03 — Adicionar busca de dispositivo por ID](03-add-get-device-by-id.md)
+- [04 — Endpoints de recuperação e redefinição de senha](04-add-password-recovery-endpoints.md)
 
 ## Ordem sugerida de implementação
 
@@ -25,8 +27,11 @@ com passos de implementação, critérios de aceite e impacto no frontend.
    de erro e o mapeamento HTTP reutilizados pela mudança **02**.
 2. Mudança **02** em seguida, para que o mesmo invariante não possa ser
    contornado pela atualização do lote.
-3. Mudança **03** por último, pois é uma melhoria de contrato e não bloqueia as
+3. Mudança **03** em seguida, pois é uma melhoria de contrato e não bloqueia as
    telas atuais.
+4. Mudança **04** por último, pois depende de um provedor de e-mail e de novas
+   tabelas; é a única que hoje deixa funcionalidade visível apenas simulada no
+   frontend.
 
 ## Proposta de commits
 
@@ -46,6 +51,7 @@ Arquivos:
 - `frontend/docs/backend-changes/01-validate-lote-capacity-on-create.md`
 - `frontend/docs/backend-changes/02-validate-lote-capacity-on-update.md`
 - `frontend/docs/backend-changes/03-add-get-device-by-id.md`
+- `frontend/docs/backend-changes/04-add-password-recovery-endpoints.md`
 
 > Os caminhos acima são relativos à raiz do monorepo.
 

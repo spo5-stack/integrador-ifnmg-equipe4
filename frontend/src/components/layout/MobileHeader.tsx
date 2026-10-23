@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom"
-import { LogOut, SunMedium } from "lucide-react"
+import { LogOut, Settings, SunMedium } from "lucide-react"
 import { navItems } from "@/components/layout/navigation"
 import { useAuth } from "@/contexts/AuthContext"
 import { cn } from "@/lib/utils"
@@ -45,6 +45,19 @@ export function MobileHeader() {
               </NavLink>
             )
           })}
+        <NavLink
+          aria-label="Configurações"
+          className={({ isActive }) =>
+            cn(
+              "grid size-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+              isActive && "bg-accent text-accent-foreground"
+            )
+          }
+          title="Configurações"
+          to="/perfil"
+        >
+          <Settings aria-hidden="true" className="size-5" />
+        </NavLink>
         <button
           aria-label="Sair"
           className="grid size-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"

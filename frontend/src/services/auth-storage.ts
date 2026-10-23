@@ -2,6 +2,8 @@ import type { AuthSession } from "@/interfaces/auth"
 
 const STORAGE_KEY = "granja.auth.session"
 
+export const SESSION_STORAGE_KEY = STORAGE_KEY
+
 type StorageKind = "local" | "session"
 
 function getStorage(kind: StorageKind): Storage | null {

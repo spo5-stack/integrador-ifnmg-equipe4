@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { Link } from "react-router-dom"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -111,15 +112,12 @@ export function LoginForm({
           >
             Senha
           </Label>
-          <button
-            aria-disabled="true"
-            className="cursor-not-allowed text-xs font-semibold text-primary/60"
-            disabled
-            title="Disponível em breve"
-            type="button"
+          <Link
+            className="text-xs font-semibold text-primary hover:underline"
+            to="/esqueci-senha"
           >
             Esqueci minha senha
-          </button>
+          </Link>
         </div>
         <div className="relative">
           <Lock

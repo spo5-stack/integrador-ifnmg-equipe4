@@ -9,6 +9,8 @@ import { CadastrarLotePage } from "@/pages/lotes/CadastrarLotePage"
 import { CriarDispositivoPage } from "@/pages/dispositivos/CriarDispositivoPage"
 import { EditarDispositivoPage } from "@/pages/dispositivos/EditarDispositivoPage"
 import { DispositivoLeiturasPage } from "@/pages/dispositivos/DispositivoLeiturasPage"
+import { PerfilPage } from "@/pages/perfil/PerfilPage"
+import { EsqueciSenhaPage } from "@/pages/auth/EsqueciSenhaPage"
 import { LoginPage } from "@/pages/auth/LoginPage"
 import { RegisterPage } from "@/pages/auth/RegisterPage"
 import { PrivateRoute } from "@/routes/PrivateRoute"
@@ -20,6 +22,7 @@ export function AppRoutes() {
       <Route element={<PublicRoute />}>
         <Route element={<LoginPage />} path="/login" />
         <Route element={<RegisterPage />} path="/cadastro" />
+        <Route element={<EsqueciSenhaPage />} path="/esqueci-senha" />
       </Route>
 
       <Route element={<PrivateRoute />}>
@@ -45,6 +48,7 @@ export function AppRoutes() {
             element={<DispositivoLeiturasPage />}
             path="dispositivos/:id/leituras"
           />
+          <Route element={<PerfilPage />} path="perfil" />
         </Route>
       </Route>
 

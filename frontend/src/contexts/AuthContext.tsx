@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import type { ReactNode } from "react"
 import type { AuthSession, Usuario } from "@/interfaces/auth"
 import {
+  SESSION_STORAGE_KEY,
   clearStoredSession,
   readStoredSession,
   saveSession,
@@ -11,6 +12,7 @@ type AuthContextValue = {
   usuario: Usuario | null
   isAuthenticated: boolean
   signIn: (session: AuthSession, remember: boolean) => void
+  updateUsuario: (usuario: Usuario) => void
   logout: () => void
 }
 
@@ -18,6 +20,15 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 
 type AuthProviderProps = {
   children: ReactNode
+}
+
+/** Indica se a sessão está persistida em `localStorage`. */
+function isPersistedInLocalStorage(): boolean {
+  try {
+    return window.localStorage.getItem(SESSION_STORAGE_KEY) !== null
+  } catch {
+    return false
+  }
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -40,6 +51,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setSession(nextSession)
   }
 
+  function updateUsuario(usuario: Usuario): void {
+    setSession((currentSession) => {
+      if (!currentSession) return currentSession
+
+      const nextSession: AuthSession = { ...currentSession, usuario }
+      saveSession(nextSession, isPersistedInLocalStorage())
+
+      return nextSession
+    })
+  }
+
   function logout(): void {
     clearStoredSession()
     setSession(null)
@@ -49,6 +71,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     usuario: session?.usuario ?? null,
     isAuthenticated: session !== null,
     signIn,
+    updateUsuario,
     logout,
   }
 
