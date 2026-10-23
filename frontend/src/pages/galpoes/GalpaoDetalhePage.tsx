@@ -351,8 +351,8 @@ export function GalpaoDetalhePage() {
                     {loteAtivoStatus.quantidade.toLocaleString("pt-BR")} aves
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {calcularDiasDesde(loteAtivoStatus.dataInicio)} dias desde
-                    o início
+                    {calcularDiasDesde(loteAtivoStatus.dataInicio)} dias desde o
+                    início
                   </p>
                 </div>
               ) : (

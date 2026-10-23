@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { REALTIME_REFRESH_INTERVAL_MS } from "@/config/realtime"
 import { getApiErrorMessage } from "@/services/api"
 import { obterStatusGalpao } from "@/services/galpaoService"
 
@@ -10,12 +11,13 @@ export function useGalpaoStatus(id: string | undefined) {
       return obterStatusGalpao(id, signal)
     },
     enabled: Boolean(id),
-    staleTime: 60_000,
+    refetchInterval: REALTIME_REFRESH_INTERVAL_MS,
+    refetchIntervalInBackground: true,
   })
 
   return {
     status: query.data ?? null,
-    isLoading: query.isPending,
+    isLoading: query.isPending && !query.data,
     erro: query.isError
       ? getApiErrorMessage(
           query.error,

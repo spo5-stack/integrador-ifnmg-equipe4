@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { REALTIME_REFRESH_INTERVAL_MS } from "@/config/realtime"
 import type { DashboardResumo } from "@/interfaces/dashboard"
 import type { Galpao } from "@/interfaces/galpao"
 import { getApiErrorMessage } from "@/services/api"
@@ -25,6 +26,8 @@ export function useDashboard() {
   const query = useQuery({
     queryKey: ["dashboard"],
     queryFn: ({ signal }) => carregarResumo(signal),
+    refetchInterval: REALTIME_REFRESH_INTERVAL_MS,
+    refetchIntervalInBackground: true,
   })
 
   const dados: DashboardResumo | null = query.data?.indicadores ?? null
@@ -37,7 +40,7 @@ export function useDashboard() {
       )
     : null
 
-  const isLoading = query.isPending || query.isFetching
+  const isLoading = query.isPending && !query.data
 
   function recarregar(): void {
     void query.refetch()
