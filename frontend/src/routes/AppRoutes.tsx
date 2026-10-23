@@ -34,10 +34,12 @@ export function AppRoutes() {
             element={<CadastrarLotePage />}
             path="galpoes/:galpaoId/lotes/novo"
           />
+          <Route element={<CadastrarLotePage />} path="lotes/novo" />
           <Route
             element={<CriarDispositivoPage />}
             path="galpoes/:galpaoId/dispositivos/novo"
           />
+          <Route element={<CriarDispositivoPage />} path="dispositivos/novo" />
           <Route element={<GalpaoDetalhePage />} path="galpoes/:id" />
           <Route element={<EditarGalpaoPage />} path="galpoes/:id/editar" />
           <Route
