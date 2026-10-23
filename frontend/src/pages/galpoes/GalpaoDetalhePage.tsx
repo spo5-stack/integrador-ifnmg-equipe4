@@ -275,18 +275,17 @@ export function GalpaoDetalhePage() {
         <>
           <section
             aria-label="Resumo do galpão"
-            className="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
+            className="grid gap-6 md:grid-cols-2 xl:grid-cols-4"
           >
             <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Bird aria-hidden="true" className="size-4 text-primary" />
                 <h2 className="text-[10px] font-bold tracking-widest uppercase">
-                  Lote Ativo &amp; Fase
+                  Lote Ativo
                 </h2>
               </div>
               {loteAtivoStatus ? (
                 <div className="mt-4 space-y-2">
-                  <FaseBadge fase={loteAtivoStatus.fase} />
                   <p className="font-heading text-2xl font-extrabold">
                     {loteAtivoStatus.quantidade.toLocaleString("pt-BR")} aves
                   </p>
@@ -294,14 +293,53 @@ export function GalpaoDetalhePage() {
                     {calcularDiasDesde(loteAtivoStatus.dataInicio)} dias desde o
                     início
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    Condição avaliada pelo backend com base na fase atual do
-                    lote.
-                  </p>
                 </div>
               ) : (
                 <p className="mt-4 text-sm text-muted-foreground">
                   Nenhum lote ativo
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <SunMedium aria-hidden="true" className="size-4 text-primary" />
+                <h2 className="text-[10px] font-bold tracking-widest uppercase">
+                  Fase
+                </h2>
+              </div>
+              {loteAtivoStatus ? (
+                <div className="mt-4 space-y-2">
+                  <FaseBadge fase={loteAtivoStatus.fase} />
+                  <p className="text-xs text-muted-foreground">
+                    Definida pelo backend com base nos dias do lote
+                  </p>
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-muted-foreground">—</p>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Lightbulb aria-hidden="true" className="size-4 text-primary" />
+                <h2 className="text-[10px] font-bold tracking-widest uppercase">
+                  Faixa ideal (luminosidade)
+                </h2>
+              </div>
+              {loteAtivoStatus && FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase] ? (
+                <div className="mt-4 space-y-1">
+                  <p className="font-heading text-2xl font-extrabold">
+                    {FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase].min}% -{" "}
+                    {FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase].max}%
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Faixa fixa por fase conforme regra do backend
+                  </p>
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-muted-foreground">
+                  Indisponível sem lote ativo
                 </p>
               )}
             </div>
@@ -318,55 +356,30 @@ export function GalpaoDetalhePage() {
               </p>
               <p className="text-sm text-muted-foreground">cadastrados</p>
             </div>
+          </section>
 
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm md:col-span-2 xl:col-span-1">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <SunMedium aria-hidden="true" className="size-4 text-primary" />
-                <h2 className="text-[10px] font-bold tracking-widest uppercase">
-                  Faixa ideal de luminosidade
+          <section
+            aria-label="Monitoramento por dispositivo"
+            className="rounded-xl border border-border bg-card shadow-sm"
+          >
+            <div className="flex flex-col gap-2 px-6 py-5 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className="font-heading text-lg font-extrabold">
+                  Monitoramento por dispositivo
                 </h2>
-              </div>
-              {loteAtivoStatus ? (
-                <div className="mt-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
-                      Fase: {loteAtivoStatus.fase}
-                    </span>
-                    <span className="font-heading text-lg font-extrabold">
-                      {FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase]
-                        ? `${FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase].min}% - ${FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase].max}%`
-                        : "Não definida"}
-                    </span>
-                  </div>
-                  <div className="rounded-lg bg-muted/60 p-3 text-xs text-muted-foreground">
-                    <p className="font-medium text-foreground">
-                      Como interpretar
-                    </p>
-                    <p className="mt-1">
-                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                        ADEQUADO
-                      </span>{" "}
-                      = dentro da faixa ideal para a fase atual.
-                    </p>
-                    <p className="mt-1">
-                      <span className="font-semibold text-red-600 dark:text-red-400">
-                        ABAIXO
-                      </span>{" "}
-                      = luminosidade menor que o mínimo recomendado.
-                    </p>
-                    <p className="mt-1">
-                      <span className="font-semibold text-red-600 dark:text-red-400">
-                        ACIMA
-                      </span>{" "}
-                      = luminosidade maior que o máximo recomendado.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <p className="mt-4 text-sm text-muted-foreground">
-                  Cadastre/ative um lote para exibir a faixa ideal por fase.
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Situação comparada à faixa ideal da fase atual. Cálculo feito
+                  pelo backend.
                 </p>
-              )}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                  ADEQUADO
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-1 text-red-600 dark:bg-red-500/20 dark:text-red-400">
+                  ABAIXO / ACIMA
+                </span>
+              </div>
             </div>
           </section>
 
@@ -429,7 +442,6 @@ export function GalpaoDetalhePage() {
                       "Modelo",
                       "Status",
                       "Leitura atual",
-                      "Faixa ideal (fase)",
                       "Situação",
                       "Ações",
                     ].map((coluna) => (
@@ -448,9 +460,6 @@ export function GalpaoDetalhePage() {
                       statusMonitoramento?.dispositivos.find(
                         (item) => item.id === dispositivo.id
                       )
-                    const faixaIdeal = loteAtivoStatus
-                      ? FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase]
-                      : null
 
                     return (
                       <TableRow key={dispositivo.id}>
@@ -487,17 +496,6 @@ export function GalpaoDetalhePage() {
                           ) : (
                             <span className="text-sm text-muted-foreground">
                               Sem leitura
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          {faixaIdeal ? (
-                            <span className="text-sm font-medium">
-                              {faixaIdeal.min}% - {faixaIdeal.max}%
-                            </span>
-                          ) : (
-                            <span className="text-sm text-muted-foreground">
-                              —
                             </span>
                           )}
                         </TableCell>
