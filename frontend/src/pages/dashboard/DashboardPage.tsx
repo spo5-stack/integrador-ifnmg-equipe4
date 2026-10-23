@@ -66,8 +66,8 @@ type AcaoRapida = {
 
 const ACOES_RAPIDAS: AcaoRapida[] = [
   { label: "Novo Galpão", icon: Building2, to: "/galpoes/novo" },
-  { label: "Cadastrar Lote", icon: CirclePlus },
-  { label: "Gerenciar Dispositivos", icon: Cpu },
+  { label: "Cadastrar Lote", icon: CirclePlus, to: "/lotes/novo" },
+  { label: "Gerenciar Dispositivos", icon: Cpu, to: "/dispositivos/novo" },
 ]
 
 function iniciaisDoUsuario(nome: string | undefined): string {
