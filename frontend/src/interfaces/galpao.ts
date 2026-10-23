@@ -59,3 +59,25 @@ export type CriarGalpaoDados = {
 }
 
 export type AtualizarGalpaoDados = Partial<CriarGalpaoDados>
+
+export type LoteResumoStatus = {
+  id: string
+  quantidade: number
+  dataInicio: string
+  status: string
+  fase: string
+}
+
+export type DispositivoStatusLuminosidade = {
+  id: string
+  nome: string
+  ultimaLeitura: { valor: number; criadoEm: string } | null
+  statusLuminosidade: string
+}
+
+export type GalpaoStatusMonitoramento = {
+  galpaoId: string
+  galpaoNome: string
+  loteAtivo: LoteResumoStatus | null
+  dispositivos: DispositivoStatusLuminosidade[]
+}

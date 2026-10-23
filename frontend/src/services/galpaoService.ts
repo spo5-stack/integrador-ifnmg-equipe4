@@ -5,6 +5,7 @@ import type {
   GalpaoBase,
   GalpaoDetalhe,
   GalpaoOpcao,
+  GalpaoStatusMonitoramento,
   GalpoesResposta,
   ListarGalpoesParams,
 } from "@/interfaces/galpao"
@@ -81,4 +82,15 @@ export async function atualizarGalpao(
 
 export async function excluirGalpao(id: string): Promise<void> {
   await api.delete(`/api/galpoes/${encodeURIComponent(id)}`)
+}
+
+export async function obterStatusGalpao(
+  id: string,
+  signal?: AbortSignal
+): Promise<GalpaoStatusMonitoramento> {
+  const { data } = await api.get<GalpaoStatusMonitoramento>(
+    `/api/galpoes/${encodeURIComponent(id)}/status`,
+    { signal }
+  )
+  return data
 }

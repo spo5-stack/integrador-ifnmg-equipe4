@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useGalpaoDetalhe } from "@/hooks/useGalpaoDetalhe"
+import { useGalpaoStatus } from "@/hooks/useGalpaoStatus"
 import type { LoteDoGalpao } from "@/interfaces/galpao"
 import { calcularDiasDesde, formatarData, formatarDataHora } from "@/lib/datas"
 import { cn } from "@/lib/utils"
@@ -58,6 +59,24 @@ function FaseBadge({ fase }: { fase: string }) {
       )}
     >
       {fase}
+    </span>
+  )
+}
+
+function StatusLuminosidadeBadge({ status }: { status: string }) {
+  return (
+    <span
+      className={cn(
+        BADGE_BASE,
+        status.toUpperCase().includes("ADEQUAD")
+          ? "bg-secondary text-secondary-foreground"
+          : status.toUpperCase().includes("ATEN")
+            ? "bg-accent text-accent-foreground"
+            : "bg-muted text-muted-foreground"
+      )}
+      title="Status de luminosidade calculado pelo backend com base na fase do lote"
+    >
+      {status}
     </span>
   )
 }
@@ -177,8 +196,10 @@ export function GalpaoDetalhePage() {
   const sucesso = (location.state as { sucesso?: string } | null)?.sucesso
   const { dados, isLoading, naoEncontrado, erro, recarregar } =
     useGalpaoDetalhe(id)
+  const { status: statusMonitoramento } = useGalpaoStatus(id)
 
   const loteAtivo = dados?.lotes.find((lote) => lote.status === "ATIVO")
+  const loteAtivoStatus = statusMonitoramento?.loteAtivo ?? loteAtivo ?? null
 
   return (
     <div className="flex flex-col gap-6">
@@ -251,18 +272,22 @@ export function GalpaoDetalhePage() {
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Bird aria-hidden="true" className="size-4 text-primary" />
                 <h2 className="text-[10px] font-bold tracking-widest uppercase">
-                  Lote Ativo
+                  Lote Ativo &amp; Fase
                 </h2>
               </div>
-              {loteAtivo ? (
+              {loteAtivoStatus ? (
                 <div className="mt-4 space-y-2">
-                  <FaseBadge fase={loteAtivo.fase} />
+                  <FaseBadge fase={loteAtivoStatus.fase} />
                   <p className="font-heading text-2xl font-extrabold">
-                    {loteAtivo.quantidade.toLocaleString("pt-BR")} aves
+                    {loteAtivoStatus.quantidade.toLocaleString("pt-BR")} aves
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {calcularDiasDesde(loteAtivo.dataInicio)} dias desde o
+                    {calcularDiasDesde(loteAtivoStatus.dataInicio)} dias desde o
                     início
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Condição avaliada pelo backend com base na fase atual do
+                    lote.
                   </p>
                 </div>
               ) : (
@@ -311,9 +336,15 @@ export function GalpaoDetalhePage() {
             className="overflow-hidden rounded-xl border border-border bg-card shadow-sm"
           >
             <div className="flex items-center justify-between gap-4 px-6 py-5">
-              <h2 className="font-heading text-lg font-extrabold">
-                Dispositivos
-              </h2>
+              <div>
+                <h2 className="font-heading text-lg font-extrabold">
+                  Dispositivos
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Situação de luminosidade calculada pelo backend com base na
+                  fase do lote.
+                </p>
+              </div>
               <Link
                 className={cn(
                   buttonVariants({ variant: "outline" }),
@@ -339,6 +370,7 @@ export function GalpaoDetalhePage() {
                       "Modelo",
                       "Status",
                       "Última Leitura",
+                      "Situação (luminosidade)",
                       "Ações",
                     ].map((coluna) => (
                       <TableHead
@@ -351,76 +383,100 @@ export function GalpaoDetalhePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {dados.dispositivos.map((dispositivo) => (
-                    <TableRow key={dispositivo.id}>
-                      <TableCell className="px-6 py-4 font-medium">
-                        {dispositivo.nome}
-                      </TableCell>
-                      <TableCell className="px-6 py-4">
-                        {dispositivo.modelo}
-                      </TableCell>
-                      <TableCell className="px-6 py-4">
-                        <StatusBadge status={dispositivo.status} />
-                      </TableCell>
-                      <TableCell className="px-6 py-4">
-                        {dispositivo.ultimaLeitura ? (
-                          <span className="flex flex-col">
-                            <span className="font-medium">
-                              {dispositivo.ultimaLeitura.valor.toLocaleString(
-                                "pt-BR"
-                              )}
-                              %
+                  {dados.dispositivos.map((dispositivo) => {
+                    const statusDispositivo =
+                      statusMonitoramento?.dispositivos.find(
+                        (item) => item.id === dispositivo.id
+                      )
+
+                    return (
+                      <TableRow key={dispositivo.id}>
+                        <TableCell className="px-6 py-4 font-medium">
+                          {dispositivo.nome}
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          {dispositivo.modelo}
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <StatusBadge status={dispositivo.status} />
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          {dispositivo.ultimaLeitura ? (
+                            <span className="flex flex-col">
+                              <span className="font-medium">
+                                {dispositivo.ultimaLeitura.valor.toLocaleString(
+                                  "pt-BR"
+                                )}
+                                %
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {formatarDataHora(
+                                  dispositivo.ultimaLeitura.criadoEm
+                                )}
+                              </span>
                             </span>
-                            <span className="text-xs text-muted-foreground">
-                              {formatarDataHora(
-                                dispositivo.ultimaLeitura.criadoEm
-                              )}
+                          ) : (
+                            "—"
+                          )}
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          {statusDispositivo?.statusLuminosidade ? (
+                            <StatusLuminosidadeBadge
+                              status={statusDispositivo.statusLuminosidade}
+                            />
+                          ) : (
+                            <span className="text-sm text-muted-foreground">
+                              —
                             </span>
-                          </span>
-                        ) : (
-                          "—"
-                        )}
-                      </TableCell>
-                      <TableCell className="px-6 py-4">
-                        <div className="flex flex-wrap items-center gap-1">
-                          <Link
-                            aria-label={`Ver leituras de ${dispositivo.nome}`}
-                            className={cn(
-                              buttonVariants({ variant: "ghost", size: "sm" }),
-                              "text-muted-foreground"
-                            )}
-                            title="Ver leituras"
-                            to={`/dispositivos/${encodeURIComponent(dispositivo.id)}/leituras`}
-                            state={{
-                              dispositivo,
-                              galpaoNome: dados.nome,
-                              galpoesId: dados.id,
-                            }}
-                          >
-                            <BarChart3 aria-hidden="true" />
-                            Ver leituras
-                          </Link>
-                          <Link
-                            aria-label={`Editar ${dispositivo.nome}`}
-                            className={cn(
-                              buttonVariants({ variant: "ghost", size: "sm" }),
-                              "text-muted-foreground"
-                            )}
-                            title="Editar"
-                            to={`/dispositivos/${encodeURIComponent(dispositivo.id)}/editar`}
-                            state={{
-                              dispositivo,
-                              galpaoNome: dados.nome,
-                              galpoesId: dados.id,
-                            }}
-                          >
-                            <Pencil aria-hidden="true" />
-                            Editar
-                          </Link>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                          )}
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <div className="flex flex-wrap items-center gap-1">
+                            <Link
+                              aria-label={`Ver leituras de ${dispositivo.nome}`}
+                              className={cn(
+                                buttonVariants({
+                                  variant: "ghost",
+                                  size: "sm",
+                                }),
+                                "text-muted-foreground"
+                              )}
+                              title="Ver leituras"
+                              to={`/dispositivos/${encodeURIComponent(dispositivo.id)}/leituras`}
+                              state={{
+                                dispositivo,
+                                galpaoNome: dados.nome,
+                                galpoesId: dados.id,
+                              }}
+                            >
+                              <BarChart3 aria-hidden="true" />
+                              Ver leituras
+                            </Link>
+                            <Link
+                              aria-label={`Editar ${dispositivo.nome}`}
+                              className={cn(
+                                buttonVariants({
+                                  variant: "ghost",
+                                  size: "sm",
+                                }),
+                                "text-muted-foreground"
+                              )}
+                              title="Editar"
+                              to={`/dispositivos/${encodeURIComponent(dispositivo.id)}/editar`}
+                              state={{
+                                dispositivo,
+                                galpaoNome: dados.nome,
+                                galpoesId: dados.id,
+                              }}
+                            >
+                              <Pencil aria-hidden="true" />
+                              Editar
+                            </Link>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
                 </TableBody>
               </Table>
             )}
