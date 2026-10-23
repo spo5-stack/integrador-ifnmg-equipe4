@@ -22,43 +22,31 @@ export function Sidebar() {
         aria-label="Navegação principal"
         className="flex flex-1 flex-col gap-1 px-3"
       >
-        {navItems.map((item) => {
-          const Icon = item.icon
+        {navItems
+          .filter((item) => Boolean(item.to))
+          .map((item) => {
+            const Icon = item.icon
+            const to = item.to as string
 
-          if (!item.to) {
             return (
-              <button
-                className="flex cursor-not-allowed items-center gap-3 rounded-lg px-4 py-3 text-left font-heading text-sm font-semibold text-sidebar-foreground/55 opacity-70"
-                disabled
+              <NavLink
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 rounded-lg px-4 py-3 font-heading text-sm font-semibold transition-colors",
+                    isActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground/65 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                  )
+                }
+                end={to === "/"}
                 key={item.label}
-                title="Disponível em breve"
-                type="button"
+                to={to}
               >
                 <Icon aria-hidden="true" className="size-5" />
                 {item.label}
-              </button>
+              </NavLink>
             )
-          }
-
-          return (
-            <NavLink
-              className={({ isActive }) =>
-                cn(
-                  "flex items-center gap-3 rounded-lg px-4 py-3 font-heading text-sm font-semibold transition-colors",
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/65 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                )
-              }
-              end={item.to === "/"}
-              key={item.label}
-              to={item.to}
-            >
-              <Icon aria-hidden="true" className="size-5" />
-              {item.label}
-            </NavLink>
-          )
-        })}
+          })}
       </nav>
 
       <div className="mt-auto flex flex-col gap-1 px-3">
