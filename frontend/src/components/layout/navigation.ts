@@ -1,4 +1,4 @@
-import { CirclePlus, LayoutDashboard, Warehouse } from "lucide-react"
+import { LayoutDashboard, Warehouse } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 export type NavItem = {
@@ -9,6 +9,5 @@ export type NavItem = {
 
 export const navItems: NavItem[] = [
   { label: "Dashboard", icon: LayoutDashboard, to: "/" },
-  { label: "Cadastrar Lote", icon: CirclePlus, to: "/galpoes" },
   { label: "Galpões", icon: Warehouse, to: "/galpoes" },
 ]
