@@ -30,6 +30,10 @@ import { calcularDiasDesde, formatarData, formatarDataHora } from "@/lib/datas"
 import { cn } from "@/lib/utils"
 
 const BADGE_BASE = "rounded-full px-3 py-1 text-xs font-semibold"
+const CARD = "rounded-xl border border-border bg-card shadow-sm"
+const LABEL = "text-[10px] font-bold tracking-widest uppercase"
+const TH =
+  "h-12 px-6 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
 
 const ESTILOS_FASE: Record<string, string> = {
   INICIAL: "bg-accent text-accent-foreground",
@@ -90,6 +94,55 @@ function StatusLuminosidadeBadge({ status }: { status: string }) {
   )
 }
 
+/** Barra 0–100% com a faixa ideal destacada e, opcionalmente, a leitura atual. */
+function BarraFaixa({
+  min,
+  max,
+  valor,
+}: {
+  min: number
+  max: number
+  valor?: number | null
+}) {
+  const marcador =
+    valor === undefined || valor === null
+      ? null
+      : Math.min(100, Math.max(0, valor))
+
+  return (
+    <div
+      aria-hidden="true"
+      className="relative h-2 w-full rounded-full bg-muted"
+    >
+      <div
+        className="absolute inset-y-0 rounded-full bg-emerald-500/30 dark:bg-emerald-500/40"
+        style={{ left: `${min}%`, width: `${max - min}%` }}
+      />
+      {marcador !== null ? (
+        <div
+          className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-card bg-primary shadow"
+          style={{ left: `${marcador}%` }}
+        />
+      ) : null}
+    </div>
+  )
+}
+
+function CardTitulo({
+  icone,
+  children,
+}: {
+  icone: React.ReactNode
+  children: React.ReactNode
+}) {
+  return (
+    <div className="flex items-center gap-2 text-muted-foreground">
+      {icone}
+      <h2 className={LABEL}>{children}</h2>
+    </div>
+  )
+}
+
 function DetalheSkeleton() {
   return (
     <div aria-busy="true" className="flex flex-col gap-6">
@@ -97,7 +150,8 @@ function DetalheSkeleton() {
         <Skeleton className="h-8 w-64 max-w-full" />
         <Skeleton className="h-4 w-40" />
       </div>
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-3">
+        <Skeleton className="h-36 rounded-xl" />
         <Skeleton className="h-36 rounded-xl" />
         <Skeleton className="h-36 rounded-xl" />
       </div>
@@ -149,10 +203,7 @@ function TabelaLotes({ lotes }: { lotes: LoteDoGalpao[] }) {
         <TableRow>
           {["Quantidade", "Data Início", "Status", "Fase", "Ações"].map(
             (coluna) => (
-              <TableHead
-                className="h-12 px-6 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
-                key={coluna}
-              >
+              <TableHead className={TH} key={coluna}>
                 {coluna}
               </TableHead>
             )
@@ -209,6 +260,14 @@ export function GalpaoDetalhePage() {
 
   const loteAtivo = dados?.lotes.find((lote) => lote.status === "ATIVO")
   const loteAtivoStatus = statusMonitoramento?.loteAtivo ?? loteAtivo ?? null
+  const faixaIdeal = loteAtivoStatus
+    ? FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase]
+    : undefined
+
+  const totalAdequados =
+    statusMonitoramento?.dispositivos.filter(
+      (d) => d.statusLuminosidade?.toUpperCase() === "ADEQUADO"
+    ).length ?? 0
 
   return (
     <div className="flex flex-col gap-6">
@@ -273,25 +332,27 @@ export function GalpaoDetalhePage() {
 
       {!isLoading && dados && !erro && !naoEncontrado ? (
         <>
+          {/* Resumo: lote, fase e dispositivos */}
           <section
             aria-label="Resumo do galpão"
-            className="grid gap-6 md:grid-cols-2 xl:grid-cols-4"
+            className="grid gap-6 md:grid-cols-3"
           >
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Bird aria-hidden="true" className="size-4 text-primary" />
-                <h2 className="text-[10px] font-bold tracking-widest uppercase">
-                  Lote Ativo
-                </h2>
-              </div>
+            <div className={cn(CARD, "p-6")}>
+              <CardTitulo
+                icone={
+                  <Bird aria-hidden="true" className="size-4 text-primary" />
+                }
+              >
+                Lote Ativo
+              </CardTitulo>
               {loteAtivoStatus ? (
-                <div className="mt-4 space-y-2">
+                <div className="mt-4 space-y-1">
                   <p className="font-heading text-2xl font-extrabold">
                     {loteAtivoStatus.quantidade.toLocaleString("pt-BR")} aves
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {calcularDiasDesde(loteAtivoStatus.dataInicio)} dias desde o
-                    início
+                    {calcularDiasDesde(loteAtivoStatus.dataInicio)} dias desde
+                    o início
                   </p>
                 </div>
               ) : (
@@ -301,18 +362,22 @@ export function GalpaoDetalhePage() {
               )}
             </div>
 
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <SunMedium aria-hidden="true" className="size-4 text-primary" />
-                <h2 className="text-[10px] font-bold tracking-widest uppercase">
-                  Fase
-                </h2>
-              </div>
+            <div className={cn(CARD, "p-6")}>
+              <CardTitulo
+                icone={
+                  <SunMedium
+                    aria-hidden="true"
+                    className="size-4 text-primary"
+                  />
+                }
+              >
+                Fase
+              </CardTitulo>
               {loteAtivoStatus ? (
                 <div className="mt-4 space-y-2">
                   <FaseBadge fase={loteAtivoStatus.fase} />
                   <p className="text-xs text-muted-foreground">
-                    Definida pelo backend com base nos dias do lote
+                    Calculada pelo backend pelos dias do lote
                   </p>
                 </div>
               ) : (
@@ -320,37 +385,14 @@ export function GalpaoDetalhePage() {
               )}
             </div>
 
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Lightbulb aria-hidden="true" className="size-4 text-primary" />
-                <h2 className="text-[10px] font-bold tracking-widest uppercase">
-                  Faixa ideal (luminosidade)
-                </h2>
-              </div>
-              {loteAtivoStatus && FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase] ? (
-                <div className="mt-4 space-y-1">
-                  <p className="font-heading text-2xl font-extrabold">
-                    {FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase].min}% -{" "}
-                    {FAIXA_IDEAL_POR_FASE[loteAtivoStatus.fase].max}%
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Faixa fixa por fase conforme regra do backend
-                  </p>
-                </div>
-              ) : (
-                <p className="mt-4 text-sm text-muted-foreground">
-                  Indisponível sem lote ativo
-                </p>
-              )}
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Cpu aria-hidden="true" className="size-4 text-primary" />
-                <h2 className="text-[10px] font-bold tracking-widest uppercase">
-                  Dispositivos
-                </h2>
-              </div>
+            <div className={cn(CARD, "p-6")}>
+              <CardTitulo
+                icone={
+                  <Cpu aria-hidden="true" className="size-4 text-primary" />
+                }
+              >
+                Dispositivos
+              </CardTitulo>
               <p className="mt-4 font-heading text-2xl font-extrabold">
                 {dados.dispositivos.length}
               </p>
@@ -358,63 +400,128 @@ export function GalpaoDetalhePage() {
             </div>
           </section>
 
+          {/* Luminosidade: faixa ideal + situação por dispositivo */}
           <section
-            aria-label="Monitoramento por dispositivo"
-            className="rounded-xl border border-border bg-card shadow-sm"
+            aria-label="Luminosidade por dispositivo"
+            className={cn(CARD, "overflow-hidden")}
           >
-            <div className="flex flex-col gap-2 px-6 py-5 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-4 px-6 py-5 md:flex-row md:items-start md:justify-between">
               <div>
-                <h2 className="font-heading text-lg font-extrabold">
-                  Monitoramento por dispositivo
-                </h2>
+                <div className="flex items-center gap-2">
+                  <Lightbulb
+                    aria-hidden="true"
+                    className="size-5 text-primary"
+                  />
+                  <h2 className="font-heading text-lg font-extrabold">
+                    Luminosidade
+                  </h2>
+                </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Situação comparada à faixa ideal da fase atual. Cálculo feito
-                  pelo backend.
+                  Leitura atual de cada dispositivo comparada à faixa ideal da
+                  fase do lote.
                 </p>
               </div>
-              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
-                  ADEQUADO
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-1 text-red-600 dark:bg-red-500/20 dark:text-red-400">
-                  ABAIXO / ACIMA
-                </span>
-              </div>
+
+              {loteAtivoStatus && faixaIdeal ? (
+                <div className="w-full rounded-xl border border-border/60 bg-muted/40 p-4 md:w-72">
+                  <p className={cn(LABEL, "text-muted-foreground")}>
+                    Faixa ideal · {loteAtivoStatus.fase}
+                  </p>
+                  <p className="mt-1 font-heading text-2xl font-extrabold">
+                    {faixaIdeal.min}% – {faixaIdeal.max}%
+                  </p>
+                  <div className="mt-3">
+                    <BarraFaixa max={faixaIdeal.max} min={faixaIdeal.min} />
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {totalAdequados} de{" "}
+                    {statusMonitoramento?.dispositivos.length ?? 0} dispositivos
+                    adequados
+                  </p>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="border-t border-border">
+              {!loteAtivoStatus || !faixaIdeal ? (
+                <p className="px-6 py-10 text-center text-sm text-muted-foreground">
+                  Indisponível sem lote ativo
+                </p>
+              ) : dados.dispositivos.length === 0 ? (
+                <p className="px-6 py-10 text-center text-sm text-muted-foreground">
+                  Nenhum dispositivo neste galpão.
+                </p>
+              ) : (
+                <ul className="divide-y divide-border">
+                  {dados.dispositivos.map((dispositivo) => {
+                    const statusDispositivo =
+                      statusMonitoramento?.dispositivos.find(
+                        (item) => item.id === dispositivo.id
+                      )
+                    const leitura = dispositivo.ultimaLeitura
+
+                    return (
+                      <li
+                        className="grid items-center gap-4 px-6 py-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_auto]"
+                        key={dispositivo.id}
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold">
+                            {dispositivo.nome}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {leitura
+                              ? `Atualizado em ${formatarDataHora(leitura.criadoEm)}`
+                              : "Sem leitura"}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <span className="w-16 shrink-0 font-heading text-xl font-extrabold">
+                            {leitura
+                              ? `${leitura.valor.toLocaleString("pt-BR")}%`
+                              : "—"}
+                          </span>
+                          <div className="flex-1">
+                            <BarraFaixa
+                              max={faixaIdeal.max}
+                              min={faixaIdeal.min}
+                              valor={leitura?.valor}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="md:justify-self-end">
+                          {statusDispositivo?.statusLuminosidade ? (
+                            <StatusLuminosidadeBadge
+                              status={statusDispositivo.statusLuminosidade}
+                            />
+                          ) : (
+                            <span className="text-sm text-muted-foreground">
+                              —
+                            </span>
+                          )}
+                        </div>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
             </div>
           </section>
 
+          {/* Dispositivos: cadastro e ações */}
           <section
-            aria-label="Lotes do galpão"
-            className="overflow-hidden rounded-xl border border-border bg-card shadow-sm"
-          >
-            <div className="flex items-center justify-between gap-4 px-6 py-5">
-              <h2 className="font-heading text-lg font-extrabold">Lotes</h2>
-              <Link
-                className={cn(
-                  buttonVariants({ variant: "outline" }),
-                  "h-auto w-fit px-5 py-2.5 font-heading text-sm font-bold"
-                )}
-                to={`/galpoes/${encodeURIComponent(dados.id)}/lotes/novo`}
-              >
-                <Plus aria-hidden="true" />
-                Cadastrar Lote
-              </Link>
-            </div>
-            <TabelaLotes lotes={dados.lotes} />
-          </section>
-
-          <section
-            aria-label="Monitoramento de luminosidade por dispositivo"
-            className="overflow-hidden rounded-xl border border-border bg-card shadow-sm"
+            aria-label="Dispositivos do galpão"
+            className={cn(CARD, "overflow-hidden")}
           >
             <div className="flex items-center justify-between gap-4 px-6 py-5">
               <div>
                 <h2 className="font-heading text-lg font-extrabold">
-                  Monitoramento de luminosidade
+                  Dispositivos
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Comparação entre leitura atual e faixa ideal para a fase do
-                  lote.
+                  Sensores cadastrados neste galpão.
                 </p>
               </div>
               <Link
@@ -437,129 +544,91 @@ export function GalpaoDetalhePage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {[
-                      "Dispositivo",
-                      "Modelo",
-                      "Status",
-                      "Leitura atual",
-                      "Situação",
-                      "Ações",
-                    ].map((coluna) => (
-                      <TableHead
-                        className="h-12 px-6 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
-                        key={coluna}
-                      >
-                        {coluna}
-                      </TableHead>
-                    ))}
+                    {["Dispositivo", "Modelo", "Status", "Ações"].map(
+                      (coluna) => (
+                        <TableHead className={TH} key={coluna}>
+                          {coluna}
+                        </TableHead>
+                      )
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {dados.dispositivos.map((dispositivo) => {
-                    const statusDispositivo =
-                      statusMonitoramento?.dispositivos.find(
-                        (item) => item.id === dispositivo.id
-                      )
-
-                    return (
-                      <TableRow key={dispositivo.id}>
-                        <TableCell className="px-6 py-4 font-medium">
-                          {dispositivo.nome}
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          {dispositivo.modelo}
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <StatusBadge status={dispositivo.status} />
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          {dispositivo.ultimaLeitura ? (
-                            <div className="flex items-center gap-2">
-                              <Lightbulb
-                                aria-hidden="true"
-                                className="size-4 text-primary"
-                              />
-                              <span className="flex flex-col">
-                                <span className="font-heading text-base font-extrabold">
-                                  {dispositivo.ultimaLeitura.valor.toLocaleString(
-                                    "pt-BR"
-                                  )}
-                                  %
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {formatarDataHora(
-                                    dispositivo.ultimaLeitura.criadoEm
-                                  )}
-                                </span>
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-sm text-muted-foreground">
-                              Sem leitura
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          {statusDispositivo?.statusLuminosidade ? (
-                            <StatusLuminosidadeBadge
-                              status={statusDispositivo.statusLuminosidade}
-                            />
-                          ) : (
-                            <span className="text-sm text-muted-foreground">
-                              —
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <div className="flex flex-wrap items-center gap-1">
-                            <Link
-                              aria-label={`Ver leituras de ${dispositivo.nome}`}
-                              className={cn(
-                                buttonVariants({
-                                  variant: "ghost",
-                                  size: "sm",
-                                }),
-                                "text-muted-foreground"
-                              )}
-                              title="Ver leituras"
-                              to={`/dispositivos/${encodeURIComponent(dispositivo.id)}/leituras`}
-                              state={{
-                                dispositivo,
-                                galpaoNome: dados.nome,
-                                galpoesId: dados.id,
-                              }}
-                            >
-                              <BarChart3 aria-hidden="true" />
-                              Ver leituras
-                            </Link>
-                            <Link
-                              aria-label={`Editar ${dispositivo.nome}`}
-                              className={cn(
-                                buttonVariants({
-                                  variant: "ghost",
-                                  size: "sm",
-                                }),
-                                "text-muted-foreground"
-                              )}
-                              title="Editar"
-                              to={`/dispositivos/${encodeURIComponent(dispositivo.id)}/editar`}
-                              state={{
-                                dispositivo,
-                                galpaoNome: dados.nome,
-                                galpoesId: dados.id,
-                              }}
-                            >
-                              <Pencil aria-hidden="true" />
-                              Editar
-                            </Link>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
+                  {dados.dispositivos.map((dispositivo) => (
+                    <TableRow key={dispositivo.id}>
+                      <TableCell className="px-6 py-4 font-medium">
+                        {dispositivo.nome}
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        {dispositivo.modelo}
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <StatusBadge status={dispositivo.status} />
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <div className="flex flex-wrap items-center gap-1">
+                          <Link
+                            aria-label={`Ver leituras de ${dispositivo.nome}`}
+                            className={cn(
+                              buttonVariants({ variant: "ghost", size: "sm" }),
+                              "text-muted-foreground"
+                            )}
+                            state={{
+                              dispositivo,
+                              galpaoNome: dados.nome,
+                              galpoesId: dados.id,
+                            }}
+                            title="Ver leituras"
+                            to={`/dispositivos/${encodeURIComponent(dispositivo.id)}/leituras`}
+                          >
+                            <BarChart3 aria-hidden="true" />
+                            Ver leituras
+                          </Link>
+                          <Link
+                            aria-label={`Editar ${dispositivo.nome}`}
+                            className={cn(
+                              buttonVariants({ variant: "ghost", size: "sm" }),
+                              "text-muted-foreground"
+                            )}
+                            state={{
+                              dispositivo,
+                              galpaoNome: dados.nome,
+                              galpoesId: dados.id,
+                            }}
+                            title="Editar"
+                            to={`/dispositivos/${encodeURIComponent(dispositivo.id)}/editar`}
+                          >
+                            <Pencil aria-hidden="true" />
+                            Editar
+                          </Link>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             )}
+          </section>
+
+          {/* Lotes */}
+          <section
+            aria-label="Lotes do galpão"
+            className={cn(CARD, "overflow-hidden")}
+          >
+            <div className="flex items-center justify-between gap-4 px-6 py-5">
+              <h2 className="font-heading text-lg font-extrabold">Lotes</h2>
+              <Link
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "h-auto w-fit px-5 py-2.5 font-heading text-sm font-bold"
+                )}
+                to={`/galpoes/${encodeURIComponent(dados.id)}/lotes/novo`}
+              >
+                <Plus aria-hidden="true" />
+                Cadastrar Lote
+              </Link>
+            </div>
+            <TabelaLotes lotes={dados.lotes} />
           </section>
         </>
       ) : null}
