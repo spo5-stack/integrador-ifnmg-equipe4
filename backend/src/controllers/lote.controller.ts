@@ -83,6 +83,9 @@ export async function atualizarLoteController(
 		if (erro instanceof DataInicioFuturaError) {
 			return reply.status(400).send({ erro: erro.message })
 		}
+		if (erro instanceof QuantidadeExcedeCapacidadeError) {
+			return reply.status(400).send({ erro: erro.message })
+		}
 		request.log.error(erro)
 		return reply.status(500).send({ erro: 'Erro interno do servidor' })
 	}

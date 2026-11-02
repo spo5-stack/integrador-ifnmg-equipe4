@@ -68,6 +68,14 @@ export async function atualizarLoteService(
 		throw new RecursoNaoEncontradoError()
 	}
 
+	if (
+		lote.status === 'ATIVO' &&
+		dados.quantidade !== undefined &&
+		dados.quantidade > lote.galpao.capacidade
+	) {
+		throw new QuantidadeExcedeCapacidadeError(lote.galpao.capacidade)
+	}
+
 	const dataParaSalvar: { quantidade?: number; dataInicio?: Date } = {}
 	if (dados.quantidade !== undefined)
 		dataParaSalvar.quantidade = dados.quantidade

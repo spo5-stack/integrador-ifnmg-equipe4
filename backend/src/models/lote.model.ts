@@ -59,7 +59,10 @@ export async function buscarLotePorId(id: string) {
 		where: { id },
 		include: {
 			galpao: {
-				select: { usuarioId: true },
+				select: {
+					usuarioId: true,
+					capacidade: true,
+				},
 			},
 		},
 	})

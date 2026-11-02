@@ -93,6 +93,8 @@ export const loteRoutes: FastifyPluginAsyncZod = async (app) => {
 					criadoEm: z.date(),
 					atualizadoEm: z.date(),
 				}),
+				400: z.object({ erro: z.string() }),
+				404: z.object({ erro: z.string() }),
 			},
 			security: [{ bearerAuth: [] }],
 		},
