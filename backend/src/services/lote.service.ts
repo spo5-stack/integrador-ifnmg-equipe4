@@ -13,6 +13,7 @@ import {
 import { calcularFase } from '../shared/utils/fase.js'
 import { DataInicioFuturaError } from './errors/data-inicio-futura.error.js'
 import { LoteAtivoExistenteError } from './errors/lote-ativo-existente.error.js'
+import { QuantidadeExcedeCapacidadeError } from './errors/quantidade-excede-capacidade.error.js'
 import { RecursoNaoEncontradoError } from './errors/recurso-nao-encontrado.error.js'
 
 export async function criarLoteService(
@@ -33,6 +34,10 @@ export async function criarLoteService(
 	const ativos = await contarLotesAtivos(galpaoId)
 	if (ativos > 0) {
 		throw new LoteAtivoExistenteError()
+	}
+
+	if (dados.quantidade > galpao.capacidade) {
+		throw new QuantidadeExcedeCapacidadeError(galpao.capacidade)
 	}
 
 	return criarLote({ ...dados, galpoesId: galpaoId })

@@ -5,6 +5,7 @@ import type {
 } from '../models/lote.model.js'
 import { DataInicioFuturaError } from '../services/errors/data-inicio-futura.error.js'
 import { LoteAtivoExistenteError } from '../services/errors/lote-ativo-existente.error.js'
+import { QuantidadeExcedeCapacidadeError } from '../services/errors/quantidade-excede-capacidade.error.js'
 import { RecursoNaoEncontradoError } from '../services/errors/recurso-nao-encontrado.error.js'
 import {
 	atualizarLoteService,
@@ -36,6 +37,9 @@ export async function criarLoteController(
 			return reply.status(409).send({ erro: erro.message })
 		}
 		if (erro instanceof DataInicioFuturaError) {
+			return reply.status(400).send({ erro: erro.message })
+		}
+		if (erro instanceof QuantidadeExcedeCapacidadeError) {
 			return reply.status(400).send({ erro: erro.message })
 		}
 		request.log.error(erro)
