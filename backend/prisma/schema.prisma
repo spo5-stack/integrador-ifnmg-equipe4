@@ -18,9 +18,11 @@ model Usuario {
   nome         String
   email        String    @unique
   senha        String
+  tokenVersion Int       @default(0) @map("token_version")
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime  @updatedAt @map("atualizado_em")
   galpoes      Galpoes[]
+  codigosRecuperacao CodigoRecuperacaoSenha[]
 
   @@map("usuarios")
 }
@@ -78,4 +80,21 @@ model LeituraSensor {
 
   @@index([dispositivosId])
   @@map("leituras_sensor")
+}
+
+model CodigoRecuperacaoSenha {
+  id                 String    @id @default(uuid())
+  usuarioId          String    @map("usuario_id")
+  usuario            Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  codigoHash         String    @map("codigo_hash")
+  resetTokenHash     String?   @unique @map("reset_token_hash")
+  resetTokenExpiraEm DateTime? @map("reset_token_expira_em")
+  tentativas         Int       @default(0)
+  expiraEm           DateTime  @map("expira_em")
+  usadoEm            DateTime? @map("usado_em")
+  criadoEm           DateTime  @default(now()) @map("criado_em")
+
+  @@index([usuarioId])
+  @@index([expiraEm])
+  @@map("codigos_recuperacao_senha")
 }
