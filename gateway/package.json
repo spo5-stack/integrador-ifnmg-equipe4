@@ -4,7 +4,7 @@
 	"description": "Aqui ficam os scripts de captura dos dados vindos do Arduino por meio da porta serial para envio ao backend.",
 	"main": "index.js",
 	"scripts": {
-		"start:gateway": "tsx watch src/serial-gateway.ts"
+		"dev": "tsx watch src/serial-gateway.ts"
 	},
 	"engines": {
 		"node": "24.x"
