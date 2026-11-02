@@ -40,8 +40,9 @@ app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
 
 app.register(cors, {
-	origin: env.CORS_ORIGIN,
-})
+  origin: env.CORS_ORIGIN,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],
+});
 
 app.register(jwt, { secret: env.JWT_SECRET })
 
