@@ -1,11 +1,18 @@
 import nodemailer, { type Transporter } from 'nodemailer'
 import { env } from '@/env/index.js'
 
-const smtpConfigurado = Boolean(
-	env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS,
-)
+const smtpConfigurado = Boolean(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS)
 
 let transporter: Transporter | null = null
+
+function escaparHtml(valor: string) {
+	return valor
+		.replaceAll('&', '&amp;')
+		.replaceAll('<', '&lt;')
+		.replaceAll('>', '&gt;')
+		.replaceAll('"', '&quot;')
+		.replaceAll("'", '&#39;')
+}
 
 function obterTransporter(): Transporter | null {
 	if (!smtpConfigurado) return null
@@ -42,9 +49,7 @@ export async function enviarCodigoRecuperacaoSenha(data: {
 			)
 		}
 
-		console.info(
-			`[recuperacao-senha] Código para ${data.para}: ${data.codigo}`,
-		)
+		console.info(`[recuperacao-senha] Código para ${data.para}: ${data.codigo}`)
 		return
 	}
 
@@ -63,7 +68,7 @@ export async function enviarCodigoRecuperacaoSenha(data: {
 			'Se você não solicitou a recuperação, ignore este e-mail.',
 		].join('\n'),
 		html: `
-			<p>Olá, ${data.nome}.</p>
+			<p>Olá, ${escaparHtml(data.nome)}.</p>
 			<p>Seu código de recuperação de senha é:</p>
 			<p style="font-size: 28px; font-weight: bold; letter-spacing: 6px;">${data.codigo}</p>
 			<p>Ele expira em <strong>10 minutos</strong> e só pode ser usado uma vez.</p>

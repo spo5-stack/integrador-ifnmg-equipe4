@@ -24,13 +24,23 @@ export const loginSchema = z.object({
 
 export type RegistrarDados = z.infer<typeof registerSchema>
 export type LoginDados = z.infer<typeof loginSchema>
-export type Usuario = { id: string; nome: string; email: string }
+export type Usuario = {
+	id: string
+	nome: string
+	email: string
+	tokenVersion: number
+}
 
 export async function criarUsuario(
 	data: RegistrarDados & { senha: string },
 ): Promise<Usuario> {
 	const usuario = await prisma.usuario.create({ data })
-	return { id: usuario.id, nome: usuario.nome, email: usuario.email }
+	return {
+		id: usuario.id,
+		nome: usuario.nome,
+		email: usuario.email,
+		tokenVersion: usuario.tokenVersion,
+	}
 }
 
 export async function buscarPorEmail(email: string) {

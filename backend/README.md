@@ -2,7 +2,7 @@
 
 API REST do sistema de monitoramento de luminosidade em galpões de criação de aves.
 
-**Stack:** Fastify 5 + Prisma 7 + MySQL + Zod 4 + TypeScript 6 + dayjs + argon2
+**Stack:** Fastify 5 + Prisma 7 + MySQL + Zod 4 + TypeScript 6 + dayjs + argon2 + Nodemailer
 
 ---
 
@@ -46,6 +46,17 @@ Edite `.env` se necessário. As variáveis disponíveis:
 | `API_URL` | Não | `http://localhost:3333` | URL base para documentação Swagger |
 | `DATABASE_URL` | **Sim** | — | URL de conexão MySQL |
 | `JWT_SECRET` | **Sim** | — | Chave secreta para tokens JWT |
+| `CORS_ORIGIN` | Não | `http://localhost:5173` | Origem permitida pelo CORS |
+| `SMTP_HOST` | Não* | — | Servidor SMTP para recuperação de senha |
+| `SMTP_PORT` | Não | `587` | Porta SMTP |
+| `SMTP_SECURE` | Não | `false` | `true` para TLS direto (porta 465) |
+| `SMTP_USER` | Não* | — | Usuário SMTP (e-mail) |
+| `SMTP_PASS` | Não* | — | Senha de app SMTP |
+| `MAIL_FROM` | Não | `SMTP_USER` | Remetente exibido no e-mail |
+
+\* Obrigatórias apenas para enviar e-mails de recuperação. Sem elas, em
+`development`, o código é impresso no log do servidor. Veja
+[`docs/configuracao-email-recuperacao-senha.md`](docs/configuracao-email-recuperacao-senha.md).
 
 ### 3. Instale as dependências
 
@@ -86,6 +97,19 @@ Acesse a interface interativa:
 
 Todas as rotas autenticadas exigem o header `Authorization: Bearer <token>`.
 
+### Recuperação de senha
+
+O fluxo usa e-mail (Nodemailer/SMTP) e possui três rotas públicas:
+
+```text
+POST /api/auth/forgot-password   → envia código de 6 dígitos
+POST /api/auth/verify-reset-code → valida o código e devolve resetToken
+POST /api/auth/reset-password    → troca a senha e invalida sessões antigas
+```
+
+Configuração de e-mail e solução de problemas:
+[`docs/configuracao-email-recuperacao-senha.md`](docs/configuracao-email-recuperacao-senha.md).
+
 ---
 
 ## Scripts disponíveis
@@ -108,13 +132,17 @@ src/
 ├── env/index.ts           # Validação de variáveis de ambiente (Zod)
 ├── shared/
 │   ├── database/prisma.ts # Instância do PrismaClient
-│   └── utils/fase.ts      # calcularFase() — cálculo dinâmico da fase da ave
+│   ├── mail/mailer.ts     # Envio de e-mail (Nodemailer/SMTP)
+│   └── utils/
+│       ├── fase.ts        # calcularFase() — fase da ave
+│       └── rate-limit.ts  # Rate limit em memória
 ├── models/                # Acesso ao banco + schemas Zod
 │   ├── auth.model.ts
 │   ├── dispositivo.model.ts
 │   ├── galpao.model.ts
 │   ├── leitura-sensor.model.ts
 │   ├── lote.model.ts
+│   ├── recuperacao-senha.model.ts
 │   └── usuario.model.ts
 ├── services/              # Regras de negócio
 │   ├── auth.service.ts
@@ -152,6 +180,9 @@ src/
 |---|---|---|
 | POST | `/api/auth/register` | Cadastrar usuário |
 | POST | `/api/auth/login` | Fazer login |
+| POST | `/api/auth/forgot-password` | Solicitar código de recuperação de senha |
+| POST | `/api/auth/verify-reset-code` | Verificar código e obter resetToken |
+| POST | `/api/auth/reset-password` | Redefinir senha com resetToken |
 | POST | `/api/leituras-sensores` | Gateway envia leituras |
 
 ### Autenticados (Bearer Token)
@@ -171,6 +202,7 @@ src/
 | PATCH | `/api/lotes/:id/encerrar` | Encerrar lote |
 | POST | `/api/galpoes/:galpaoId/dispositivos` | Cadastrar dispositivo |
 | GET | `/api/galpoes/:galpaoId/dispositivos` | Listar dispositivos |
+| GET | `/api/dispositivos/:id` | Buscar dispositivo por ID |
 | PUT | `/api/dispositivos/:id` | Editar dispositivo |
 | DELETE | `/api/dispositivos/:id` | Remover dispositivo |
 | GET | `/api/dispositivos/:dispositivosId/leituras` | Histórico de leituras |

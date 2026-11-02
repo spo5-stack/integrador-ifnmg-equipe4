@@ -98,10 +98,14 @@ export async function redefinirSenhaComCodigo(data: {
 	senhaHash: string
 }) {
 	return prisma.$transaction(async (tx) => {
-		await tx.codigoRecuperacaoSenha.update({
-			where: { id: data.codigoId },
+		const consumido = await tx.codigoRecuperacaoSenha.updateMany({
+			where: { id: data.codigoId, usadoEm: null },
 			data: { usadoEm: new Date() },
 		})
+
+		if (consumido.count === 0) {
+			return null
+		}
 
 		await tx.codigoRecuperacaoSenha.updateMany({
 			where: { usuarioId: data.usuarioId, usadoEm: null },

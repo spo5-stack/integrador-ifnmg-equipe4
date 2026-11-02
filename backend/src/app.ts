@@ -17,6 +17,7 @@ import { leituraSensorRoutes } from './routes/leituras-sensor.routes.js'
 import { loteRoutes } from './routes/lote.routes.js'
 import { monitoramentoRoutes } from './routes/monitoramento.routes.js'
 import { usuarioRoutes } from './routes/usuario.routes.js'
+import { prisma } from './shared/database/prisma.js'
 
 const envToLogger = {
 	development: {
@@ -40,16 +41,26 @@ app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
 
 app.register(cors, {
-  origin: env.CORS_ORIGIN,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],
-});
+	origin: env.CORS_ORIGIN,
+	methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+})
 
 app.register(jwt, { secret: env.JWT_SECRET })
 
 app.decorate(
 	'authenticate',
-	async (request: FastifyRequest, _reply: FastifyReply) => {
+	async (request: FastifyRequest, reply: FastifyReply) => {
 		await request.jwtVerify()
+
+		const usuario = await prisma.usuario.findUnique({
+			where: { id: request.user.sub },
+			select: { tokenVersion: true },
+		})
+
+		if (!usuario || usuario.tokenVersion !== (request.user.ver ?? 0)) {
+			await reply.status(401).send({ erro: 'Sessão inválida ou expirada' })
+			return
+		}
 	},
 )
 
