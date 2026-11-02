@@ -1,5 +1,5 @@
 #define LDR_SENSOR A0
-#define INTERVALO_LEITURA 8000  // 5 minutos em prod (30000ms)
+#define INTERVALO_LEITURA 60000  // 5 minutos em prod (30000ms)
 #define NUM_AMOSTRAS 5
 #define INTERVALO_AMOSTRAS 100   
 
