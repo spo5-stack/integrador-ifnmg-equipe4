@@ -2,6 +2,7 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import z from 'zod'
 import {
 	atualizarDispositivoController,
+	buscarDispositivoController,
 	criarDispositivoController,
 	deletarDispositivoController,
 	listarDispositivosController,
@@ -59,6 +60,23 @@ export const dispositivoRoutes: FastifyPluginAsyncZod = async (app) => {
 		},
 		onRequest: [app.authenticate],
 		handler: listarDispositivosController,
+	})
+
+	app.route({
+		method: 'GET',
+		url: '/dispositivos/:id',
+		schema: {
+			tags: ['dispositivos'],
+			summary: 'Buscar dispositivo por ID',
+			params: z.object({ id: z.uuid() }),
+			response: {
+				200: dispositivoResponse,
+				404: erroResponse,
+			},
+			security: [{ bearerAuth: [] }],
+		},
+		onRequest: [app.authenticate],
+		handler: buscarDispositivoController,
 	})
 
 	app.route({

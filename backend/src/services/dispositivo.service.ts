@@ -37,6 +37,17 @@ export async function listarDispositivosService(
 	return listarDispositivosPorGalpao(galpaoId)
 }
 
+export async function buscarDispositivoService(id: string, usuarioId: string) {
+	const dispositivo = await buscarDispositivoPorId(id)
+
+	if (!dispositivo || dispositivo.galpao.usuarioId !== usuarioId) {
+		throw new RecursoNaoEncontradoError()
+	}
+
+	const { galpao: _, ...dados } = dispositivo
+	return dados
+}
+
 export async function atualizarDispositivoService(
 	id: string,
 	dados: AtualizarDispositivoDados,

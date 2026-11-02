@@ -5,6 +5,7 @@ import type {
 } from '../models/dispositivo.model.js'
 import {
 	atualizarDispositivoService,
+	buscarDispositivoService,
 	criarDispositivoService,
 	deletarDispositivoService,
 	listarDispositivosService,
@@ -49,6 +50,25 @@ export async function listarDispositivosController(
 			usuarioId,
 		)
 		return reply.send(dispositivos)
+	} catch (erro) {
+		if (erro instanceof RecursoNaoEncontradoError) {
+			return reply.status(404).send({ erro: erro.message })
+		}
+		request.log.error(erro)
+		return reply.status(500).send({ erro: 'Erro interno do servidor' })
+	}
+}
+
+export async function buscarDispositivoController(
+	request: FastifyRequest<{ Params: IdParams }>,
+	reply: FastifyReply,
+) {
+	try {
+		const dispositivo = await buscarDispositivoService(
+			request.params.id,
+			request.user.sub,
+		)
+		return reply.send(dispositivo)
 	} catch (erro) {
 		if (erro instanceof RecursoNaoEncontradoError) {
 			return reply.status(404).send({ erro: erro.message })
