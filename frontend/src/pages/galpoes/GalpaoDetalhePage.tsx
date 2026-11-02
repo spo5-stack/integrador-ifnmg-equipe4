@@ -6,6 +6,7 @@ import {
   Building2,
   Cpu,
   Lightbulb,
+  Loader2,
   Pencil,
   Plus,
   SunMedium,
@@ -13,6 +14,17 @@ import {
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import { RequestError } from "@/components/feedback/RequestError"
 import { SuccessBanner } from "@/components/feedback/SuccessBanner"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -23,6 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useEncerrarLote } from "@/hooks/useEncerrarLote"
 import { useGalpaoDetalhe } from "@/hooks/useGalpaoDetalhe"
 import { useGalpaoStatus } from "@/hooks/useGalpaoStatus"
 import type { LoteDoGalpao } from "@/interfaces/galpao"
@@ -188,7 +201,17 @@ function EstadoNaoEncontrado() {
   )
 }
 
-function TabelaLotes({ lotes }: { lotes: LoteDoGalpao[] }) {
+function TabelaLotes({
+  lotes,
+  isEncerrando,
+  loteEmEncerramentoId,
+  onSolicitarEncerramento,
+}: {
+  lotes: LoteDoGalpao[]
+  isEncerrando: boolean
+  loteEmEncerramentoId?: string
+  onSolicitarEncerramento: (lote: LoteDoGalpao) => void
+}) {
   if (lotes.length === 0) {
     return (
       <p className="px-6 py-10 text-center text-sm text-muted-foreground">
@@ -228,15 +251,28 @@ function TabelaLotes({ lotes }: { lotes: LoteDoGalpao[] }) {
             <TableCell className="px-6 py-4">
               {lote.status === "ATIVO" ? (
                 <Button
+                  aria-label={`Encerrar lote de ${lote.quantidade.toLocaleString(
+                    "pt-BR"
+                  )} aves`}
                   className="text-muted-foreground"
-                  disabled
+                  disabled={isEncerrando}
+                  onClick={() => onSolicitarEncerramento(lote)}
                   size="sm"
-                  title="Disponível em breve"
+                  title="Encerrar lote"
                   type="button"
                   variant="ghost"
                 >
-                  <Ban aria-hidden="true" />
-                  Encerrar
+                  {loteEmEncerramentoId === lote.id ? (
+                    <Loader2
+                      aria-hidden="true"
+                      className="animate-spin motion-reduce:animate-none"
+                    />
+                  ) : (
+                    <Ban aria-hidden="true" />
+                  )}
+                  {loteEmEncerramentoId === lote.id
+                    ? "Encerrando..."
+                    : "Encerrar"}
                 </Button>
               ) : (
                 <span className="text-muted-foreground">—</span>
@@ -257,6 +293,17 @@ export function GalpaoDetalhePage() {
   const { dados, isLoading, naoEncontrado, erro, recarregar } =
     useGalpaoDetalhe(id)
   const { status: statusMonitoramento } = useGalpaoStatus(id)
+  const {
+    loteParaEncerrar,
+    loteEmEncerramentoId,
+    isEncerrando,
+    erroEncerramento,
+    sucessoEncerramento,
+    solicitarEncerramento,
+    cancelarEncerramento,
+    confirmarEncerramento,
+    limparSucesso,
+  } = useEncerrarLote(id)
 
   const loteAtivo = dados?.lotes.find((lote) => lote.status === "ATIVO")
   const loteAtivoStatus = statusMonitoramento?.loteAtivo ?? loteAtivo ?? null
@@ -320,6 +367,22 @@ export function GalpaoDetalhePage() {
             navigate(location.pathname, { replace: true, state: null })
           }
         />
+      ) : null}
+
+      {sucessoEncerramento ? (
+        <SuccessBanner
+          message={sucessoEncerramento}
+          onDismiss={limparSucesso}
+        />
+      ) : null}
+
+      {erroEncerramento ? (
+        <div
+          className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
+          role="alert"
+        >
+          {erroEncerramento}
+        </div>
       ) : null}
 
       {isLoading ? <DetalheSkeleton /> : null}
@@ -628,10 +691,59 @@ export function GalpaoDetalhePage() {
                 Cadastrar Lote
               </Link>
             </div>
-            <TabelaLotes lotes={dados.lotes} />
+            <TabelaLotes
+              isEncerrando={isEncerrando}
+              loteEmEncerramentoId={loteEmEncerramentoId}
+              lotes={dados.lotes}
+              onSolicitarEncerramento={solicitarEncerramento}
+            />
           </section>
         </>
       ) : null}
+
+      <AlertDialog
+        onOpenChange={(aberto) => {
+          if (!aberto) cancelarEncerramento()
+        }}
+        open={loteParaEncerrar !== null}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogMedia className="bg-destructive/10 text-destructive">
+              <Ban aria-hidden="true" />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Encerrar lote?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O lote de{" "}
+              <strong className="font-semibold text-foreground">
+                {loteParaEncerrar?.quantidade.toLocaleString("pt-BR")} aves
+              </strong>{" "}
+              será marcado como encerrado e não poderá mais receber leituras
+              como lote ativo. Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isEncerrando}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-white hover:bg-destructive/90"
+              disabled={isEncerrando}
+              onClick={() => confirmarEncerramento()}
+            >
+              {isEncerrando ? (
+                <Loader2
+                  aria-hidden="true"
+                  className="animate-spin motion-reduce:animate-none"
+                />
+              ) : (
+                <Ban aria-hidden="true" />
+              )}
+              Encerrar lote
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

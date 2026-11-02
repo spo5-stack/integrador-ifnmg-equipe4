@@ -12,3 +12,11 @@ export async function criarLote(
 
   return data
 }
+
+export async function encerrarLote(id: string): Promise<Lote> {
+  const { data } = await api.patch<Lote>(
+    `/api/lotes/${encodeURIComponent(id)}/encerrar`
+  )
+
+  return data
+}
