@@ -7,12 +7,12 @@ com passos de implementação, critérios de aceite e impacto no frontend.
 
 ## Resumo
 
-| #   | Mudança                                                       | Prioridade | Status   | Impacto no frontend                                                            |
-| --- | ------------------------------------------------------------- | ---------- | -------- | ------------------------------------------------------------------------------ |
-| 01  | Validar quantidade do lote contra a capacidade na criação     | Alta       | Pendente | O frontend já bloqueia, mas a API ainda aceita quantidade acima da capacidade  |
-| 02  | Validar quantidade do lote contra a capacidade na atualização | Média      | Pendente | Fecha o bypass via `PUT /api/lotes/{id}`                                       |
-| 03  | Adicionar `GET /api/dispositivos/{id}`                        | Média      | Pendente | Remove a busca sequencial em todos os galpões ao abrir a edição por URL direta |
-| 04  | Endpoints de recuperação e redefinição de senha               | Alta       | Pendente | As telas de recuperação ficam UI-only (simuladas) até existirem os endpoints  |
+| #   | Mudança                                                       | Prioridade | Status       | Impacto no frontend                                                            |
+| --- | ------------------------------------------------------------- | ---------- | ------------ | ------------------------------------------------------------------------------ |
+| 01  | Validar quantidade do lote contra a capacidade na criação     | Alta       | Implementado | O frontend já bloqueia, mas a API ainda aceita quantidade acima da capacidade  |
+| 02  | Validar quantidade do lote contra a capacidade na atualização | Média      | Implementado | Fecha o bypass via `PUT /api/lotes/{id}`                                       |
+| 03  | Adicionar `GET /api/dispositivos/{id}`                        | Média      | Implementado | Remove a busca sequencial em todos os galpões ao abrir a edição por URL direta |
+| 04  | Endpoints de recuperação e redefinição de senha               | Alta       | Implementado | As telas de recuperação já consomem os endpoints reais   |
 
 ## Arquivos
 
