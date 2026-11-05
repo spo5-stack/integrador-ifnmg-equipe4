@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ArrowRight, CircleCheck, Loader2, Mail } from "lucide-react"
-import { useEffect, useState } from "react"
+import { ArrowRight, Loader2, Mail } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
@@ -17,17 +16,22 @@ const esqueciSenhaSchema = z.object({
 
 export type EsqueciSenhaFormValues = z.infer<typeof esqueciSenhaSchema>
 
-const LATENCIA_SIMULADA = 900
-const DURACAO_ALERTA = 4000
+type EsqueciSenhaFormProps = {
+  onSubmit: (dados: EsqueciSenhaFormValues) => void
+  isSubmitting: boolean
+  serverError?: string
+  onFieldChange?: () => void
+}
 
-export function EsqueciSenhaForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [sucesso, setSucesso] = useState(false)
-
+export function EsqueciSenhaForm({
+  onSubmit,
+  isSubmitting,
+  serverError,
+  onFieldChange,
+}: EsqueciSenhaFormProps) {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<EsqueciSenhaFormValues>({
     resolver: zodResolver(esqueciSenhaSchema),
@@ -36,47 +40,23 @@ export function EsqueciSenhaForm() {
     reValidateMode: "onChange",
   })
 
-  useEffect(() => {
-    if (!sucesso) return
-
-    const timeoutId = window.setTimeout(() => setSucesso(false), DURACAO_ALERTA)
-    return () => window.clearTimeout(timeoutId)
-  }, [sucesso])
-
   const emailField = register("email", {
-    onChange: () => {
-      if (sucesso) setSucesso(false)
-    },
+    onChange: () => onFieldChange?.(),
   })
-
-  function handleSubmitFormulario(): void {
-    setIsSubmitting(true)
-
-    // A recuperação de senha ainda não tem backend. Este envio é apenas uma
-    // simulação de UI e não deve ser trocado por uma chamada HTTP inventada.
-    window.setTimeout(() => {
-      setIsSubmitting(false)
-      setSucesso(true)
-      reset({ email: "" })
-    }, LATENCIA_SIMULADA)
-  }
 
   return (
     <form
       aria-busy={isSubmitting}
       className="flex flex-col gap-4"
       noValidate
-      onSubmit={handleSubmit(handleSubmitFormulario)}
+      onSubmit={handleSubmit((dados) => onSubmit(dados))}
     >
-      {sucesso ? (
+      {serverError ? (
         <div
-          className="flex items-center justify-center gap-2 text-secondary-foreground"
-          role="status"
+          className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-center text-sm font-semibold text-destructive"
+          role="alert"
         >
-          <span className="grid size-6 shrink-0 place-items-center rounded-full bg-secondary">
-            <CircleCheck aria-hidden="true" className="size-4" />
-          </span>
-          <p className="text-sm font-semibold">Código enviado com sucesso!</p>
+          {serverError}
         </div>
       ) : null}
 
@@ -131,10 +111,6 @@ export function EsqueciSenhaForm() {
         {isSubmitting ? "Enviando..." : "Enviar código de Recuperação"}
         {isSubmitting ? null : <ArrowRight aria-hidden="true" />}
       </Button>
-
-      <p className="text-center text-xs text-muted-foreground">
-        Recuperação por e-mail ainda não está disponível neste sistema.
-      </p>
     </form>
   )
 }

@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { AuthShell } from "@/components/auth/AuthShell"
 import { LoginForm, type LoginFormValues } from "@/components/login/LoginForm"
+import { SuccessBanner } from "@/components/feedback/SuccessBanner"
 import { useAuth } from "@/contexts/AuthContext"
 import { getApiErrorMessage, getApiErrorStatus } from "@/services/api"
 import { login } from "@/services/authService"
@@ -10,6 +11,7 @@ type LocationState = {
   from?: {
     pathname?: string
   }
+  sucesso?: string
 }
 
 type LoginVariables = {
@@ -21,6 +23,7 @@ export function LoginPage() {
   const { signIn } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const sucesso = (location.state as LocationState | null)?.sucesso
 
   const mutation = useMutation({
     mutationFn: ({ dados }: LoginVariables) => login(dados),
@@ -63,6 +66,15 @@ export function LoginPage() {
         </header>
 
         <div className="space-y-6 p-8">
+          {sucesso ? (
+            <SuccessBanner
+              message={sucesso}
+              onDismiss={() =>
+                navigate(location.pathname, { replace: true, state: null })
+              }
+            />
+          ) : null}
+
           <LoginForm
             isSubmitting={mutation.isPending}
             onFieldChange={() => {

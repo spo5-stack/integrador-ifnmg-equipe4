@@ -19,6 +19,18 @@ export async function criarDispositivo(
   return data
 }
 
+export async function obterDispositivo(
+  id: string,
+  signal?: AbortSignal
+): Promise<Dispositivo> {
+  const { data } = await api.get<Dispositivo>(
+    `/api/dispositivos/${encodeURIComponent(id)}`,
+    { signal }
+  )
+
+  return data
+}
+
 export async function listarDispositivosDoGalpao(
   galpaoId: string,
   signal?: AbortSignal

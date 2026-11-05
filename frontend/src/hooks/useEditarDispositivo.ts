@@ -5,9 +5,9 @@ import type { Dispositivo } from "@/interfaces/dispositivo"
 import { getApiErrorMessage, getApiErrorStatus } from "@/services/api"
 import {
   editarDispositivo,
-  listarDispositivosDoGalpao,
+  obterDispositivo,
 } from "@/services/dispositivoService"
-import { listarGalpoesParaSelecao } from "@/services/galpaoService"
+import { obterGalpao } from "@/services/galpaoService"
 
 export type EstadoInicialEdicao = {
   dispositivo?: Dispositivo
@@ -26,31 +26,20 @@ export function useEditarDispositivo(
   const buscaQuery = useQuery({
     queryKey: ["dispositivo", dispositivoId, "busca"],
     enabled: Boolean(dispositivoId) && !dispositivoInicial,
+    retry: (tentativas, erro) =>
+      getApiErrorStatus(erro) !== 404 && tentativas < 2,
     queryFn: async ({ signal }) => {
-      const galpoes = await listarGalpoesParaSelecao()
+      const dispositivo = await obterDispositivo(
+        dispositivoId as string,
+        signal
+      )
 
-      for (const galpao of galpoes) {
-        if (signal.aborted) return null
-
-        let dispositivos: Dispositivo[]
-
-        try {
-          dispositivos = await listarDispositivosDoGalpao(galpao.id, signal)
-        } catch {
-          if (signal.aborted) return null
-          continue
-        }
-
-        const encontrado = dispositivos.find(
-          (dispositivo) => dispositivo.id === dispositivoId
-        )
-
-        if (encontrado) {
-          return { dispositivo: encontrado, galpaoNome: galpao.nome }
-        }
+      try {
+        const galpao = await obterGalpao(dispositivo.galpoesId, signal)
+        return { dispositivo, galpaoNome: galpao.nome }
+      } catch {
+        return { dispositivo, galpaoNome: "" }
       }
-
-      return null
     },
   })
 
@@ -61,8 +50,10 @@ export function useEditarDispositivo(
 
   const isBuscando = buscaQuery.isPending || buscaQuery.isFetching
   const isLoading = Boolean(dispositivoId) && !dispositivoInicial && isBuscando
+  const buscaNaoEncontrada =
+    !dispositivoInicial && getApiErrorStatus(buscaQuery.error) === 404
   const erroCarregamento =
-    !dispositivoInicial && buscaQuery.isError && !dispositivo
+    !dispositivoInicial && buscaQuery.isError && !buscaNaoEncontrada
       ? getApiErrorMessage(
           buscaQuery.error,
           "Não foi possível carregar o dispositivo. Tente novamente."
@@ -70,11 +61,16 @@ export function useEditarDispositivo(
       : null
   const naoEncontrado =
     !dispositivoId ||
+    buscaNaoEncontrada ||
     (!dispositivoInicial && !isBuscando && !dispositivo && !erroCarregamento)
 
   const mutation = useMutation({
     mutationFn: (dados: EditarDispositivoFormValues) =>
-      editarDispositivo(dispositivoId as string, dados),
+      editarDispositivo(dispositivoId as string, {
+        nome: dados.nome,
+        modelo: dados.modelo,
+        status: dados.status,
+      }),
     onSuccess: (atualizado) => {
       void queryClient.invalidateQueries({
         queryKey: ["galpao", atualizado.galpoesId],

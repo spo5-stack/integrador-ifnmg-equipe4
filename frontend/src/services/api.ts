@@ -6,7 +6,13 @@ type ApiErrorBody = {
   message?: string
 }
 
-const AUTH_ROUTES = ["/api/auth/login", "/api/auth/register"]
+const AUTH_ROUTES = [
+  "/api/auth/login",
+  "/api/auth/register",
+  "/api/auth/forgot-password",
+  "/api/auth/verify-reset-code",
+  "/api/auth/reset-password",
+]
 
 function isAuthRoute(url: string | undefined): boolean {
   return AUTH_ROUTES.some((route) => url?.includes(route))

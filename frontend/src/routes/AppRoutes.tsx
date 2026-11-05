@@ -10,8 +10,10 @@ import { CriarDispositivoPage } from "@/pages/dispositivos/CriarDispositivoPage"
 import { EditarDispositivoPage } from "@/pages/dispositivos/EditarDispositivoPage"
 import { DispositivoLeiturasPage } from "@/pages/dispositivos/DispositivoLeiturasPage"
 import { PerfilPage } from "@/pages/perfil/PerfilPage"
+import { CodigoVerificacaoPage } from "@/pages/auth/CodigoVerificacaoPage"
 import { EsqueciSenhaPage } from "@/pages/auth/EsqueciSenhaPage"
 import { LoginPage } from "@/pages/auth/LoginPage"
+import { RedefinirSenhaPage } from "@/pages/auth/RedefinirSenhaPage"
 import { RegisterPage } from "@/pages/auth/RegisterPage"
 import { PrivateRoute } from "@/routes/PrivateRoute"
 import { PublicRoute } from "@/routes/PublicRoute"
@@ -22,6 +24,14 @@ export function AppRoutes() {
       <Route element={<PublicRoute />}>
         <Route element={<LoginPage />} path="/login" />
         <Route element={<RegisterPage />} path="/cadastro" />
+        <Route
+          element={<CodigoVerificacaoPage />}
+          path="/esqueci-senha/codigo"
+        />
+        <Route
+          element={<RedefinirSenhaPage />}
+          path="/esqueci-senha/redefinir"
+        />
         <Route element={<EsqueciSenhaPage />} path="/esqueci-senha" />
       </Route>
 
